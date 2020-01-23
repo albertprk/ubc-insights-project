@@ -1,0 +1,38 @@
+{
+    "title": "Unexpected response status 400: NOT must be object",
+    "query": {
+  "WHERE": {
+    "OR": [
+      {
+        "NOT": [
+          {
+            "GT": {
+              "courses_avg": 90
+            }
+          },
+          {
+            "IS": {
+              "courses_dept": "adhe"
+            }
+          }
+        ]
+      },
+      {
+        "EQ": {
+          "courses_avg": 95
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      12,
+      "courses_id",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+},
+    "isQueryValid": false,
+    "result": "InsightError"
+}

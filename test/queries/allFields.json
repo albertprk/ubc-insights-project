@@ -1,0 +1,45 @@
+{
+    "title": "SELECT dept 'aanb', avg WHERE avg < 90",
+    "query": {
+        "WHERE": {
+          "AND": [
+            {
+              "LT": {
+                "courses_avg" : 90
+                }
+            },
+            {
+                "IS": {
+                  "courses_dept":"aanb"
+                }
+              }
+          ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+              "courses_dept",
+              "courses_avg",
+              "courses_fail",
+              "courses_pass",
+              "courses_audit",
+              "courses_year",
+              "courses_id",
+              "courses_instructor",
+              "courses_title",
+              "courses_uuid"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result": [
+        {
+            "courses_dept": "aanb",
+            "courses_avg": 87.83
+        },
+        {
+            "courses_dept": "aanb",
+            "courses_avg": 87.83
+        }
+    ]
+}
