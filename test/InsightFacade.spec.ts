@@ -1,6 +1,8 @@
 import { expect } from "chai";
 import * as fs from "fs-extra";
 import InsightFacade from "../src/controller/InsightFacade";
+import TreeNode from "../src/controller/TreeNode";
+import ParsingTree from "../src/controller/ParsingTree";
 import {
     InsightError,
     NotFoundError,
@@ -607,6 +609,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 expect.fail(err, expected, "Should not have rejected");
             });
     });
+
 });
 
 /*

@@ -1,6 +1,10 @@
 import TreeNode from "./TreeNode";
+import Log from "../Util";
 
 export default class ParsingTree {
+  constructor() {
+      Log.trace("ParsingTree::init()");
+  }
 
 // TODO: if the secion is set to overall, the year should be 1900
   public MFIELD_MAP: Record<string, string> = {avg: "Avg", pass: "Pass", fail: "Fail",
@@ -9,31 +13,15 @@ export default class ParsingTree {
   public SFIELD_MAP: Record<string, string> = {dept: "Subject", id: "id", instructor: "Professor",
    title: "Title", uuid: "Course"};
 
-  public createParsingTree(query: any): TreeNode {
-    let value: string;
-    Object.keys(query).forEach((val: string) => {
-      value = val;
-    });
-
-    let root: TreeNode = new TreeNode(value, "LOGIC");
-    Object.keys((newRoot: string) => {
-      root.children.push(this.createTreeNode(query[newRoot]));
-    });
-
-    return root;
-  }
-
-  private createTreeNode(query: any): TreeNode {
+  public createTreeNode(query: any): TreeNode {
     let root: TreeNode;
 
-    if (query instanceof Number) {
-      return new TreeNode(query, "Number");
-    } else if (query instanceof String) {
-      return new TreeNode(query, "String");
+    if (typeof query === "string" || typeof query === "number") {
+      return new TreeNode(query);
     }
 
     const key: string = Object.keys(query)[0];
-    root = new TreeNode(key, "Logic");
+    root = new TreeNode(key);
 
     if (Array.isArray(query[key])) {
       query[key].forEach((obj: any) => {
@@ -70,7 +58,7 @@ export default class ParsingTree {
       return this.matchesIs(section, tree.children[0]);
     }
 
-    return false;
+    return result;
   }
 
   private isEqual(section: any, tree: TreeNode): boolean {
@@ -95,9 +83,9 @@ export default class ParsingTree {
     try {
       const sectionKey = this.MFIELD_MAP[mKey];
       if (mKey === "year" && section["Section"] === "overall") {
-        return value > 1900;
+        return value < 1900;
       } else {
-        return value > section[sectionKey];
+        return value < section[sectionKey];
       }
     } catch {
       return false;
@@ -110,9 +98,9 @@ export default class ParsingTree {
     try {
       const sectionKey = this.MFIELD_MAP[mKey];
       if (mKey === "year" && section["Section"] === "overall") {
-        return value < 1900;
+        return value > 1900;
       } else {
-        return value < section[sectionKey];
+        return value > section[sectionKey];
       }
     } catch {
       return false;
@@ -123,10 +111,10 @@ export default class ParsingTree {
     const sKey: string = tree.value.split("_")[1];
     const value: string = tree.children[0].value;
     try {
-      const sectionKey: string = this.MFIELD_MAP[sKey];
+      const sectionKey: string = this.SFIELD_MAP[sKey];
 
       if (!value.includes("*")) {
-        return value === section[sectionKey];
+        return section[sectionKey] === value;
       }
 
       const firstWildcard: number = value.indexOf("*");
@@ -143,7 +131,7 @@ export default class ParsingTree {
         return section[sectionKey].substring(0, firstWildcard) === beginning;
       }
     } catch {
-      return false;
+      return null;
     }
   }
 }
