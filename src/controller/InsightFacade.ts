@@ -12,8 +12,8 @@ export default class InsightFacade implements IInsightFacade {
         Log.trace("InsightFacadeImpl::init()");
     }
 
-    private LOGIC: string[] = ["and", "or"];
-    private MCOMPARATOR: string[] = ["lt", "gt", "eq"];
+    private LOGIC: string[] = ["AND", "OR"];
+    private MCOMPARATOR: string[] = ["LT", "GT", "EQ"];
     private SFIELD: string[] = ["dept", "id", "instructor", "title", "uuid"];
     private MFIELD: string[] = ["avg", "pass", "fail", "audit", "year"];
 
@@ -42,15 +42,17 @@ export default class InsightFacade implements IInsightFacade {
         let result: boolean = true;
 
         Object.keys(query).forEach((key: string) => {
-          const currentKey: string = key.toLowerCase();
-          if (currentKey === "where") {
-            result = result && this.isValidBody(query[key], dataset);
-          } else if (currentKey === "options") {
-            result = result && this.isValidOptions(query[key], dataset);
-          } else {
+          if (key !== "WHERE" && key !== "OPTIONS") {
             return false;
           }
         });
+
+        try {
+          result = result && this.isValidBody(query["WHERE"], dataset);
+          result = result && this.isValidOptions(query["OPTIONS"], dataset);
+        } catch {
+          return false;
+        }
 
         return result;
     }
@@ -69,15 +71,13 @@ export default class InsightFacade implements IInsightFacade {
         }
 
         Object.keys(query).forEach((key: string) => {
-            const currentKey: string = key.toLowerCase();
-
-            if (this.LOGIC.includes(currentKey)) {
+            if (this.LOGIC.includes(key)) {
                 return this.isValidLogicComparison(query[key], dataset);
-            } else if (this.MCOMPARATOR.includes(currentKey)) {
+            } else if (this.MCOMPARATOR.includes(key)) {
                 return this.isValidMComparison(query[key], dataset);
-            } else if (currentKey === "is") {
+            } else if (key === "IS") {
                 return this.isValidSComparison(query[key], dataset);
-            } else if (currentKey === "not") {
+            } else if (key === "NOT") {
                 return this.isValidNegation(query[key], dataset);
             } else {
                 return false;
@@ -161,10 +161,9 @@ export default class InsightFacade implements IInsightFacade {
         let columnValues: string[] = [];
 
         Object.keys(query).forEach((key: string) => {
-            const currentKey: string = key.toLowerCase();
-            if (currentKey !== "columns" && currentKey !== "order") {
+            if (key !== "COLUMNS" && key !== "ORDER") {
                 return false;
-            } else if (currentKey === "columns") {
+            } else if (key === "COLUMNS") {
                 hasColumns = true;
                 result = result && this.isValidColumns(query[key], dataset);
 
@@ -178,8 +177,9 @@ export default class InsightFacade implements IInsightFacade {
             return false;
         }
 
+
         Object.keys(query).forEach((key: string) => {
-            if (key.toLowerCase() === "order") {
+            if (key.toLowerCase() === "ORDER") {
                 result = result && this.isValidOrder(query[key], dataset, columnValues);
             }
         });
@@ -263,9 +263,9 @@ export default class InsightFacade implements IInsightFacade {
 
         try {
           Object.keys(query).forEach((options: any) => {
-            if (options.toLowerCase() === "options") {
+            if (options === "OPTIONS") {
               Object.keys(query[options]).forEach((col: string) => {
-                if (col.toLowerCase() === "columns") {
+                if (col === "COLUMNS") {
                   let result: string = query[options][col][0];
                   const index: number = result.indexOf("_");
                   return index > 0 ? result.substring(0, index) : null;
