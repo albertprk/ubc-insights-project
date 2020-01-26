@@ -164,3 +164,122 @@ describe("ParsingTree: createParsingTree", () => {
     expect(tree.children[1].value).to.equal("GT");
   });
 });
+
+describe("ParsingTree: reformattingSection", () => {
+  let parsingTree: ParsingTree;
+  let columns: string[];
+
+  beforeEach(() => {
+    parsingTree = new ParsingTree();
+    columns = ["courses_dept", "courses_id", "courses_year"];
+  });
+
+  it("Should return null, because fields are missing", () => {
+    const section = {Title: "intr modern asia", Section: "001",
+      Avg: 65.29, Campus: "ubc", Subject: "bota"};
+
+    expect(parsingTree.reformatSection(section, columns)).to.equal(null);
+  });
+
+  it("Should return list because all values are present", () => {
+    const section = {Title: "intr modern asia", Section: "001",
+      Avg: 65.29, Campus: "ubc", Subject: "bota", id: "304", Year: 2020};
+
+    const expected = {courses_dept: "bota", courses_id: "304", courses_year: 2020};
+
+    expect(parsingTree.reformatSection(section, columns)).to.deep.equal(expected);
+  });
+
+  it("Should have 1900 listed as the year", () => {
+    const section = {Title: "intr modern asia", Section: "overall",
+      Avg: 65.29, Campus: "ubc", Subject: "bota", id: "304", Year: 2020};
+
+    const expected = {courses_dept: "bota", courses_id: "304", courses_year: 1900};
+
+    expect(parsingTree.reformatSection(section, columns)).to.deep.equal(expected);
+  });
+});
+
+
+describe("ParsingTree: reformattingSection", () => {
+  let parsingTree: ParsingTree;
+  let query: any;
+  let sections: any[];
+
+  beforeEach(() => {
+    parsingTree = new ParsingTree();
+    query = {
+              WHERE: {
+                    AND: [
+                      {
+                        GT: {
+                          courses_year: 1950
+                        }
+                      },
+                      {
+                        IS: {
+                          courses_dept: "*a"
+                        }
+                      }
+                    ]
+                  },
+              OPTIONS: {
+                COLUMNS: [
+                  "courses_dept",
+                  "courses_id",
+                  "courses_year"
+                ],
+                ORDER: "courses_year"
+              }
+            };
+
+    sections = [{courses_dept: "bota", courses_id: "304", courses_year: 1900},
+    {courses_dept: "aadhe", courses_id: "304", courses_year: 2000}];
+  });
+
+  it("Should sort according to order", () => {
+    const expected = [{courses_dept: "bota", courses_id: "304", courses_year: 1900},
+    {courses_dept: "aadhe", courses_id: "304", courses_year: 2000}];
+    expect(parsingTree.sortSections(sections, query)).to.deep.equal(expected);
+  });
+
+  it("Should sort according to column[0]", () => {
+    const noOrderQuery = {
+              WHERE: {
+                    AND: [
+                      {
+                        GT: {
+                          courses_year: 1950
+                        }
+                      },
+                      {
+                        IS: {
+                          courses_dept: "*a"
+                        }
+                      }
+                    ]
+                  },
+              OPTIONS: {
+                COLUMNS: [
+                  "courses_dept",
+                  "courses_id",
+                  "courses_year"
+                ]
+              }
+            };
+
+    const expected = [{courses_dept: "aadhe", courses_id: "304", courses_year: 2000},
+    {courses_dept: "bota", courses_id: "304", courses_year: 1900}];
+    expect(parsingTree.sortSections(sections, noOrderQuery)).to.deep.equal(expected);
+  });
+
+  it("Should sort in order numbers correctly", () => {
+    sections = [{courses_dept: "aadhe", courses_id: "304", courses_year: 2000},
+    {courses_dept: "bota", courses_id: "304", courses_year: 1900}];
+
+    const expected = [{courses_dept: "bota", courses_id: "304", courses_year: 1900},
+    {courses_dept: "aadhe", courses_id: "304", courses_year: 2000}];
+    expect(parsingTree.sortSections(sections, query)).to.deep.equal(expected);
+  });
+
+});

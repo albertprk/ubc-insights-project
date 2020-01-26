@@ -6,7 +6,6 @@ export default class ParsingTree {
       Log.trace("ParsingTree::init()");
   }
 
-// TODO: if the secion is set to overall, the year should be 1900
   public MFIELD_MAP: Record<string, string> = {avg: "Avg", pass: "Pass", fail: "Fail",
   audit: "Audit", year: "Year"};
 
@@ -69,6 +68,8 @@ export default class ParsingTree {
       const sectionKey = this.MFIELD_MAP[mKey];
       if (mKey === "year" && section["Section"] === "overall") {
         return value === 1900;
+      } else if (typeof section[sectionKey] === "undefined") {
+        return false;
       } else {
         return value === section[sectionKey];
       }
@@ -84,6 +85,8 @@ export default class ParsingTree {
       const sectionKey = this.MFIELD_MAP[mKey];
       if (mKey === "year" && section["Section"] === "overall") {
         return value < 1900;
+      } else if (typeof section[sectionKey] === "undefined") {
+        return false;
       } else {
         return value < section[sectionKey];
       }
@@ -99,6 +102,8 @@ export default class ParsingTree {
       const sectionKey = this.MFIELD_MAP[mKey];
       if (mKey === "year" && section["Section"] === "overall") {
         return value > 1900;
+      } else if (typeof section[sectionKey] === "undefined") {
+        return false;
       } else {
         return value > section[sectionKey];
       }
@@ -112,6 +117,10 @@ export default class ParsingTree {
     const value: string = tree.children[0].value;
     try {
       const sectionKey: string = this.SFIELD_MAP[sKey];
+
+      if (typeof section[sectionKey] === "undefined") {
+        return false;
+      }
 
       if (!value.includes("*")) {
         return section[sectionKey] === value;
@@ -131,7 +140,53 @@ export default class ParsingTree {
         return section[sectionKey].substring(0, firstWildcard) === beginning;
       }
     } catch {
+      return false;
+    }
+  }
+
+  public reformatSection(section: any, columns: string[]): Record<string, any> {
+    let reformattedSection: Record<string, any> = {};
+
+    try {
+      for (let col of columns) {
+      const key: string = col.split("_")[1];
+
+      if (typeof section[this.MFIELD_MAP[key]] !== "undefined") {
+        reformattedSection[col] = (key === "year" && section["Section"] === "overall") ?
+                                  1900 : section[this.MFIELD_MAP[key]];
+      } else if (typeof section[this.SFIELD_MAP[key]] !== "undefined") {
+        reformattedSection[col] = section[this.SFIELD_MAP[key]];
+      } else {
+        return null;
+      }
+      }
+
+      return reformattedSection;
+    } catch {
       return null;
     }
+  }
+
+  public sortSections(sections: any[], query: any): any[] {
+    let orderKey: string;
+    if (typeof query["OPTIONS"]["ORDER"] !== "undefined") {
+      orderKey = query["OPTIONS"]["ORDER"];
+    } else {
+      orderKey = query["OPTIONS"]["COLUMNS"][0];
+    }
+
+    sections.sort((a: any, b: any) => {
+      if (typeof a[orderKey] === "string" && a[orderKey] < b[orderKey]) {
+        return -1;
+      } else if (typeof a[orderKey] === "string" && a[orderKey] > b[orderKey]) {
+        return 1;
+      } else if (typeof a[orderKey] === "string") {
+        return 0;
+      } else {
+        return a[orderKey] - b[orderKey];
+      }
+    });
+
+    return sections;
   }
 }
