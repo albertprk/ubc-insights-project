@@ -1,7 +1,9 @@
 import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import QueryValidator from "./QueryValidator";
-import { InsightError, NotFoundError } from "./IInsightFacade";
+import ParsingTree from "./ParsingTree";
+import TreeNode from "./TreeNode";
+import { InsightError, NotFoundError, ResultTooLargeError } from "./IInsightFacade";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -22,11 +24,29 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public performQuery(query: any): Promise<any[]> {
-        let validator: QueryValidator = new QueryValidator();
-        const dataSet: string = validator.determineDataset(query);
-        if (dataSet === null || !validator.isValidQuery(query, dataSet)) {
-            return Promise.reject(new InsightError());
-        }
+      // return new Promise((resolve, reject) => {
+      //   let validator: QueryValidator = new QueryValidator();
+      //   const dataSetName: string = validator.determineDataset(query);
+      //
+      //   if (dataSetName === null || !validator.isValidQuery(query, dataSetName)) {
+      //       reject(new InsightError("Invalid query"));
+      //   } else if (typeof this.datasets[dataSetName] === "undefined") {
+      //       reject(new InsightError("Invalid dataset"));
+      //   };
+      //
+      //   try {
+      //     let parsingTree: ParsingTree = new ParsingTree();
+      //     const tree: TreeNode = parsingTree.createTreeNode(query);
+      //     let result: any[] = parsingTree.searchSections(this.datasets[dataSetName],
+                                                            // tree, query["OPTIONS"]["COLUMNS"]);
+      //     result = parsingTree.sortSections(result, query);
+      //     resolve(result);
+      //   } catch {
+      //     reject(new ResultTooLargeError())
+      //   }
+      // });
+
+
         return Promise.reject("Not implemented.");
     }
 

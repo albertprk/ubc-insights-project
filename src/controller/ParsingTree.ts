@@ -1,11 +1,13 @@
 import TreeNode from "./TreeNode";
 import Log from "../Util";
+import { ResultTooLargeError } from "./IInsightFacade";
 
 export default class ParsingTree {
   constructor() {
       Log.trace("ParsingTree::init()");
   }
 
+// TODO: update map, Albert has already reformatted names. This isn't needed
   public MFIELD_MAP: Record<string, string> = {avg: "Avg", pass: "Pass", fail: "Fail",
   audit: "Audit", year: "Year"};
 
@@ -151,6 +153,7 @@ export default class ParsingTree {
       for (let col of columns) {
       const key: string = col.split("_")[1];
 
+      // TODO: EDIT TO MATCH ALBERT's IMPLEMENTATION
       if (typeof section[this.MFIELD_MAP[key]] !== "undefined") {
         reformattedSection[col] = (key === "year" && section["Section"] === "overall") ?
                                   1900 : section[this.MFIELD_MAP[key]];
@@ -189,4 +192,19 @@ export default class ParsingTree {
 
     return sections;
   }
+
+  // public searchSections(dataset: Dataset, tree: TreeNode, columns: string[]): any[] {
+  //   let result: any[] = [];
+  //
+  //   for (let section of dataset.sections) {
+  //     if (this.meetsTreeCriteria(section, tree)) {
+  //       result.push(this.reformatSection(section, columns));
+  //       if (result.length > 5000) {
+  //         throw new ResultTooLargeError();
+  //       }
+  //     }
+  //   }
+  //
+  //   return result;
+  // }
 }
