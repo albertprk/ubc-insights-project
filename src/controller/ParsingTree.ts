@@ -8,6 +8,7 @@ export default class ParsingTree {
   }
 
 // TODO: update map, Albert has already reformatted names. This isn't needed
+// Also to do: section is a type, need to redo how to access
   public MFIELD_MAP: Record<string, string> = {avg: "Avg", pass: "Pass", fail: "Fail",
   audit: "Audit", year: "Year"};
 
