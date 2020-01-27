@@ -1,14 +1,20 @@
 import * as fs from "fs";
 import Log from "../src/Util";
 import { ITestQuery } from "./InsightFacade.spec";
-import {expect} from "chai";
-import {InsightError, ResultTooLargeError} from "../src/controller/IInsightFacade";
+import { expect } from "chai";
+import {
+    InsightError,
+    ResultTooLargeError,
+} from "../src/controller/IInsightFacade";
 
 export default class TestUtil {
-
     // To students: There is no need or expectation for you to understand or modify this file
     // However checkQueryResult below may be of interest.
-    public static checkQueryResult(test: ITestQuery, response: any, done: any): void {
+    public static checkQueryResult(
+        test: ITestQuery,
+        response: any,
+        done: any,
+    ): void {
         try {
             if (test.isQueryValid) {
                 expect(response).to.deep.equal(test.result);
@@ -57,11 +63,18 @@ export default class TestUtil {
 
             try {
                 const query = JSON.parse(content.toString());
-                TestUtil.validate(query, {title: "string", query: null, isQueryValid: "boolean", result: null});
+                TestUtil.validate(query, {
+                    title: "string",
+                    query: null,
+                    isQueryValid: "boolean",
+                    result: null,
+                });
                 query["filename"] = file;
                 testQueries.push(query);
             } catch (err) {
-                Log.error(`${methodName} ${skipFile} does not conform to the query schema.`);
+                Log.error(
+                    `${methodName} ${skipFile} does not conform to the query schema.`,
+                );
                 throw new Error(`In ${file} ${err.message}`);
             }
         }
@@ -102,14 +115,17 @@ export default class TestUtil {
         }
     }
 
-    private static validate(content: any, schema: {[key: string]: string}) {
+    private static validate(content: any, schema: { [key: string]: string }) {
         for (const [property, type] of Object.entries(schema)) {
             if (!content.hasOwnProperty(property)) {
                 throw new Error(`required property ${property} is missing.`);
             } else if (type !== null && typeof content[property] !== type) {
-                throw new Error(`the value of ${property} is not ${type === "object" ? "an" : "a"} ${type}.`);
+                throw new Error(
+                    `the value of ${property} is not ${
+                        type === "object" ? "an" : "a"
+                    } ${type}.`,
+                );
             }
-
         }
     }
 }
