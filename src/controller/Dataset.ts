@@ -1,8 +1,7 @@
-import {InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import Section from "./Section";
+import { InsightDataset, InsightDatasetKind } from "./IInsightFacade";
 
 export default class Dataset {
-    public sections: Section[];
+    public sections: any[];
     public id: string;
     public kind: InsightDatasetKind;
     public numRows: number;
@@ -14,7 +13,7 @@ export default class Dataset {
         this.numRows = 0;
     }
 
-    public addSection(section: Section): void {
+    public addSection(section: any): void {
         this.sections.push(section);
         this.numRows++;
     }

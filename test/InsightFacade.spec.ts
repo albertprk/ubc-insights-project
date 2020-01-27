@@ -609,7 +609,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 expect.fail(err, expected, "Should not have rejected");
             });
     });
-
 });
 
 /*
