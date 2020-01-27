@@ -22,8 +22,8 @@ export default class InsightFacade implements IInsightFacade {
         content: string,
         kind: InsightDatasetKind,
     ): Promise<string[]> {
-        if (id === null || id === undefined || content === null || content === undefined || kind === null ||
-            kind === undefined) {
+        if (id === null || typeof id === "undefined" || content === null ||
+        typeof content === "undefined" || kind === null || typeof kind === "undefined") {
             return new Promise((resolve, reject) => {
                 reject(new InsightError("Error: function parameters can not be null or undefined"));
             });
@@ -33,7 +33,7 @@ export default class InsightFacade implements IInsightFacade {
                 reject(new InsightError("Error: ID must not contain underscore or be whitespace"));
             });
         }
-        if (Array.from(this.datasets.keys()).includes(id)) {
+        if (Array.from(Object.keys(this.datasets)).includes(id)) {
             return new Promise((resolve, reject) => {
                 reject(new InsightError("Error: A dataset with the given ID has already been added."));
             });
@@ -56,6 +56,7 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
 
+    // Todo: <PROJECT_DIRECTORY>/DATA
     private processZipContent(id: string, content: string, kind: InsightDatasetKind): Dataset {
         let zipFile: JSZip = new JSZip();
         let dataset: Dataset = new Dataset(id, kind);
@@ -98,4 +99,3 @@ export default class InsightFacade implements IInsightFacade {
         return Promise.reject("Not implemented.");
     }
 }
-
