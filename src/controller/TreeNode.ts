@@ -8,4 +8,8 @@ export default class TreeNode {
         this.value = value;
         this.children = [];
     }
+
+    public getValue(): any {
+      return this.value;
+    }
 }

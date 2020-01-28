@@ -11,8 +11,12 @@ export default class QueryValidator {
     private MFIELD: string[] = ["avg", "pass", "fail", "audit", "year"];
 
     private isValidObject(query: any): boolean {
-        if (query === null || typeof query === "undefined" || Array.isArray(query) ||
-        !(query instanceof Object)) {
+        if (
+            query === null ||
+            typeof query === "undefined" ||
+            Array.isArray(query) ||
+            !(query instanceof Object)
+        ) {
             return false;
         } else {
             return true;
@@ -47,7 +51,10 @@ export default class QueryValidator {
             return false;
         }
 
-        return (Object.keys(query).length === 0 || this.isValidFilter(query, dataset));
+        return (
+            Object.keys(query).length === 0 ||
+            this.isValidFilter(query, dataset)
+        );
     }
 
     private isValidFilter(query: any, dataset: string): boolean {
@@ -77,7 +84,9 @@ export default class QueryValidator {
         }
 
         for (let key of Object.keys(query)) {
-          return this.isValidMKey(key, dataset) && typeof query[key] === "number";
+            return (
+                this.isValidMKey(key, dataset) && typeof query[key] === "number"
+            );
         }
     }
 
@@ -110,7 +119,10 @@ export default class QueryValidator {
         }
 
         for (let key of Object.keys(query)) {
-          return this.isValidSKey(key, dataset) && this.isValidWildcard(query[key]);
+            return (
+                this.isValidSKey(key, dataset) &&
+                this.isValidWildcard(query[key])
+            );
         }
     }
 
@@ -123,8 +135,12 @@ export default class QueryValidator {
     }
 
     private isValidLogicComparison(query: any, dataset: string): boolean {
-        if (query === null || typeof query === "undefined" || !Array.isArray(query) ||
-            query.length === 0) {
+        if (
+            query === null ||
+            typeof query === "undefined" ||
+            !Array.isArray(query) ||
+            query.length === 0
+        ) {
             return false;
         }
 
@@ -174,8 +190,15 @@ export default class QueryValidator {
         return result;
     }
 
-    private isValidOrder(query: any, dataset: string, columnValues: string[]): boolean {
-        if (!(query instanceof String) || !columnValues.includes(query.toString())) {
+    private isValidOrder(
+        query: any,
+        dataset: string,
+        columnValues: string[],
+    ): boolean {
+        if (
+            !(query instanceof String) ||
+            !columnValues.includes(query.toString())
+        ) {
             return false;
         }
         return this.isValidKey(query.toString(), dataset);
@@ -192,8 +215,12 @@ export default class QueryValidator {
     }
 
     private isValidColumns(query: any, dataset: string): boolean {
-        if (query === null || typeof query === "undefined" || !Array.isArray(query) ||
-            query.length === 0) {
+        if (
+            query === null ||
+            typeof query === "undefined" ||
+            !Array.isArray(query) ||
+            query.length === 0
+        ) {
             return false;
         }
 
@@ -207,7 +234,11 @@ export default class QueryValidator {
     }
 
     private isValidIdString(idString: string, dataset: string): boolean {
-        return (idString.length >= 1 && !idString.includes("_") && idString === dataset);
+        return (
+            idString.length >= 1 &&
+            !idString.includes("_") &&
+            idString === dataset
+        );
     }
 
     private isValidInputString(inputString: string): boolean {
@@ -224,7 +255,8 @@ export default class QueryValidator {
         } else {
             const inputs: string[] = mKey.split("_");
             return (
-                this.isValidIdString(inputs[0], dataset) && this.MFIELD.includes(inputs[1])
+                this.isValidIdString(inputs[0], dataset) &&
+                this.MFIELD.includes(inputs[1])
             );
         }
     }
@@ -235,7 +267,8 @@ export default class QueryValidator {
         } else {
             const inputs: string[] = mKey.split("_");
             return (
-                this.isValidIdString(inputs[0], dataset) && this.SFIELD.includes(inputs[1])
+                this.isValidIdString(inputs[0], dataset) &&
+                this.SFIELD.includes(inputs[1])
             );
         }
     }
@@ -252,7 +285,9 @@ export default class QueryValidator {
                         if (col === "COLUMNS") {
                             let result: string = query[options][col][0];
                             const index: number = result.indexOf("_");
-                            return index > 0 ? result.substring(0, index) : null;
+                            return index > 0
+                                ? result.substring(0, index)
+                                : null;
                         }
                     }
                 }

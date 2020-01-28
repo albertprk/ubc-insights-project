@@ -1,4 +1,5 @@
 import { InsightDataset, InsightDatasetKind } from "./IInsightFacade";
+import Log from "../Util";
 
 export default class Dataset {
     public sections: any[];

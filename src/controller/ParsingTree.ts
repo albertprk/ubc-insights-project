@@ -20,10 +20,10 @@ export default class ParsingTree {
 
     public SFIELD_MAP: Record<string, string> = {
         dept: "Subject",
-        id: "id",
+        id: "Course",
         instructor: "Professor",
         title: "Title",
-        uuid: "Course",
+        uuid: "id",
     };
 
     public createTreeNode(query: any): TreeNode {
@@ -56,36 +56,45 @@ export default class ParsingTree {
             tree.children.forEach((node: TreeNode) => {
                 result = result && this.meetsTreeCriteria(section, node);
             });
+            // Log.info("AND" + result);
         } else if (tree.value === "OR") {
             result = false;
             tree.children.forEach((node: TreeNode) => {
                 result = result || this.meetsTreeCriteria(section, node);
             });
         } else if (tree.value === "EQ") {
+            // Log.info("eq" + this.isEqual(section, tree.children[0]));
             return this.isEqual(section, tree.children[0]);
         } else if (tree.value === "GT") {
+            // Log.info("gt" + this.isGreaterThan(section, tree.children[0]));
             return this.isGreaterThan(section, tree.children[0]);
         } else if (tree.value === "LT") {
+            // Log.info("lt" + this.isLessThan(section, tree.children[0]));
             return this.isLessThan(section, tree.children[0]);
         } else if (tree.value === "IS") {
+            // Log.info("is" + this.matchesIs(section, tree.children[0]));
             return this.matchesIs(section, tree.children[0]);
+        } else {
+          return false;
         }
 
         return result;
     }
 
+    // Todo: fix year int rounding
     private isEqual(section: any, tree: TreeNode): boolean {
         const mKey: string = tree.value.split("_")[1];
         const value: number = tree.children[0].value;
 
         try {
+            // Log.info(this.MFIELD_MAP[mKey]);
             const sectionKey = this.MFIELD_MAP[mKey];
             if (mKey === "year" && section["Section"] === "overall") {
                 return value === 1900;
             } else if (typeof section[sectionKey] === "undefined") {
                 return false;
             } else {
-                return value === section[sectionKey];
+                return value === parseFloat(section[sectionKey]);
             }
         } catch {
             return false;
@@ -94,15 +103,16 @@ export default class ParsingTree {
 
     private isGreaterThan(section: any, tree: TreeNode): boolean {
         const mKey: string = tree.value.split("_")[1];
-        const value: number = tree.children[0].value;
+        const value: any = tree.children[0].value;
         try {
             const sectionKey = this.MFIELD_MAP[mKey];
             if (mKey === "year" && section["Section"] === "overall") {
                 return value < 1900;
             } else if (typeof section[sectionKey] === "undefined") {
+                // Log.info("GT");
                 return false;
             } else {
-                return value < section[sectionKey];
+                return value < parseFloat(section[sectionKey]);
             }
         } catch {
             return false;
@@ -117,9 +127,10 @@ export default class ParsingTree {
             if (mKey === "year" && section["Section"] === "overall") {
                 return value > 1900;
             } else if (typeof section[sectionKey] === "undefined") {
+                // Log.info("LT");
                 return false;
             } else {
-                return value > section[sectionKey];
+                return value > parseFloat(section[sectionKey]);
             }
         } catch {
             return false;
@@ -181,22 +192,25 @@ export default class ParsingTree {
                 const key: string = col.split("_")[1];
 
                 // TODO: EDIT TO MATCH ALBERT's IMPLEMENTATION
-                if (typeof section[this.MFIELD_MAP[key]] !== "undefined") {
+                if (typeof section[this.MFIELD_MAP[key]] !== "undefined" && key === "year") {
                     reformattedSection[col] =
                         key === "year" && section["Section"] === "overall"
                             ? 1900
-                            : section[this.MFIELD_MAP[key]];
-                } else if (
-                    typeof section[this.SFIELD_MAP[key]] !== "undefined"
-                ) {
-                    reformattedSection[col] = section[this.SFIELD_MAP[key]];
+                            : parseInt(section[this.MFIELD_MAP[key]], 10);
+                } else if (typeof section[this.MFIELD_MAP[key]] !== "undefined") {
+                    reformattedSection[col] = section[this.MFIELD_MAP[key]];
+                } else if (typeof section[this.SFIELD_MAP[key]] !== "undefined") {
+                    reformattedSection[col] = (key === "uuid") ?
+                                              section[this.SFIELD_MAP[key]].toString() :
+                                              section[this.SFIELD_MAP[key]];
                 } else {
+                    Log.info("WRONG WRONG WRONG");
                     return null;
                 }
             }
-
             return reformattedSection;
         } catch {
+            Log.info("BAD BAd BAD");
             return null;
         }
     }
@@ -227,16 +241,17 @@ export default class ParsingTree {
         return sections;
     }
 
-    public searchSections(dataset: Dataset, tree: TreeNode, columns: string[]): any[] {
+    public searchSections(
+        dataset: Dataset,
+        tree: TreeNode,
+        columns: string[],
+    ): any[] {
         let result: any[] = [];
-        Log.info("SEARCH SECTION");
-        Log.info(dataset.sections);
-        Log.info(dataset.sections.length);
-
-        for (let section of dataset.sections.keys()) {
-            Log.info("Criteria: " + this.meetsTreeCriteria(section, tree));
+        for (let section of dataset.sections) {
+            // Log.info(section);
+            // Log.info("Criteria: " + this.meetsTreeCriteria(section, tree));
             if (this.meetsTreeCriteria(section, tree)) {
-                Log.info("Met criteria");
+                // Log.info("Met criteria");
                 result.push(this.reformatSection(section, columns));
                 if (result.length > 5000) {
                     throw new ResultTooLargeError();

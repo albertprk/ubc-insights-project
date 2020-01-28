@@ -10,7 +10,11 @@ import {
 import QueryValidator from "./QueryValidator";
 import ParsingTree from "./ParsingTree";
 import TreeNode from "./TreeNode";
-import {InsightError, NotFoundError, ResultTooLargeError} from "./IInsightFacade";
+import {
+    InsightError,
+    NotFoundError,
+    ResultTooLargeError,
+} from "./IInsightFacade";
 import Dataset from "./Dataset";
 
 /**
@@ -21,6 +25,8 @@ import Dataset from "./Dataset";
 
 export default class InsightFacade implements IInsightFacade {
     public datasets: Map<string, Dataset>;
+    private dataFolder: string = path.join(__dirname, "/data");
+    private dataSet: Dataset;
 
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
@@ -118,39 +124,39 @@ export default class InsightFacade implements IInsightFacade {
         return Promise.reject("Not implemented.");
     }
 
+    // TO DO: validQuery not catching everything
     public performQuery(query: any): Promise<any[]> {
         let dataFolder: string = path.join(__dirname, "/data");
         return new Promise((resolve, reject) => {
             let validator: QueryValidator = new QueryValidator();
             const dataSetName: string = validator.determineDataset(query);
-            Log.info("Name: " + dataSetName);
-            if (
-                dataSetName === null ||
-                !validator.isValidQuery(query, dataSetName)
-            ) {
-                if (dataSetName === null) {
-                    Log.info("Name: " + dataSetName);
-                } else {
-                    Log.info("Query is invalid");
-                }
+            if (dataSetName === null || !validator.isValidQuery(query, dataSetName)) {
                 reject(new InsightError("Invalid query name"));
             }
 
             let content: string;
 
             try {
-                const filePath = path.join(dataFolder, "/" + dataSetName + ".zip");
+                const filePath = path.join(
+                    dataFolder,
+                    "/" + dataSetName + ".zip",
+                );
                 content = fs.readFileSync(filePath).toString();
             } catch {
                 reject(new InsightError("Unable to load file"));
             }
 
+            try {
+                let result = this.findQueryResults(query, dataSetName);
+                resolve(result);
+            } catch {
+                reject(new ResultTooLargeError());
+            }
             this.addDataset(dataSetName, content, InsightDatasetKind.Courses)
                 .catch((err: any) => {
                     if (!Array.from(this.datasets.keys()).includes(dataSetName)) {
                         reject(new InsightError("Invalid dataset"));
                     }
-                    Log.info("CATCHING");
                 })
                 .then((result: string[]) => {
                     try {
@@ -166,10 +172,12 @@ export default class InsightFacade implements IInsightFacade {
     private findQueryResults(query: any, dataSetName: string): any[] {
         try {
             let parsingTree: ParsingTree = new ParsingTree();
-            const tree: TreeNode = parsingTree.createTreeNode(query);
-            Log.info(this.datasets.get(dataSetName));
+            const tree: TreeNode = parsingTree.createTreeNode(query["WHERE"]);
             let result: any[] = parsingTree.searchSections(
-                this.datasets.get(dataSetName), tree, query["OPTIONS"]["COLUMNS"]);
+                this.datasets.get(dataSetName),
+                tree,
+                query["OPTIONS"]["COLUMNS"],
+            );
             result = parsingTree.sortSections(result, query);
             return result;
         } catch {
