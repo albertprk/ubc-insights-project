@@ -3,23 +3,19 @@ import Log from "../Util";
 
 export default class Dataset {
     public sections: any[];
-    public id: string;
-    public kind: InsightDatasetKind;
-    public numRows: number;
+    public insightDataset: InsightDataset;
 
     public constructor(id: string, kind: InsightDatasetKind) {
         this.sections = [];
-        this.id = id;
-        this.kind = kind;
-        this.numRows = 0;
+        this.insightDataset = {id: id, kind: kind, numRows: 0};
     }
 
     public addSection(section: any): void {
         this.sections.push(section);
-        this.numRows++;
+        this.insightDataset.numRows++;
     }
 
     public getNumRows() {
-        return this.numRows;
+        return this.insightDataset.numRows;
     }
 }

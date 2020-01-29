@@ -69,23 +69,20 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((resolve, reject) => {
             let datasetNames: string[] = [];
             try {
-                let dataset: Dataset;
                 this.processZipContent(id, content, kind).then((result) => {
-                  dataset = result;
+                  resolve(result);
                 });
             } catch {
-                throw new InsightError(
+              reject(new InsightError(
                     "Error: Problem processing the data zip. Ensure the content given" +
-                        "is a valid ZIP file.",
-                );
+                        "is a valid ZIP file."));
             }
-            resolve(Array.from(this.datasets.keys()));
         });
     }
 
     // Todo: <PROJECT_DIRECTORY>/DATA
     // TODO: Add guard
-    private processZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
+    private processZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
       return new Promise((resolve, reject) => {
         let zipFile: JSZip = new JSZip();
         zipFile
@@ -114,7 +111,7 @@ export default class InsightFacade implements IInsightFacade {
                   return dataset;
             }).then((data: Dataset) => {
               this.datasets.set(id, data);
-              resolve(data);
+              resolve(Array.from(this.datasets.keys()));
             })
 
             .catch((err) => {
@@ -189,6 +186,17 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public listDatasets(): Promise<InsightDataset[]> {
-        return Promise.reject("Not implemented.");
+        return new Promise((resolve, reject) => {
+          let results: InsightDataset[] = [];
+
+          try {
+              this.datasets.forEach((value: Dataset, key: string) => {
+                results.push(value.insightDataset);
+              });
+              resolve(results);
+          } catch {
+            reject(new InsightError());
+          }
+        });
     }
 }
