@@ -204,7 +204,6 @@ export default class ParsingTree {
                                               section[this.SFIELD_MAP[key]].toString() :
                                               section[this.SFIELD_MAP[key]];
                 } else {
-                    Log.info("WRONG WRONG WRONG");
                     return null;
                 }
             }

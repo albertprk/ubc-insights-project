@@ -69,8 +69,10 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((resolve, reject) => {
             let datasetNames: string[] = [];
             try {
-                let dataset: Dataset = this.processZipContent(id, content, kind);
-                this.datasets.set(id, dataset);
+                let dataset: Dataset;
+                this.processZipContent(id, content, kind).then((result) => {
+                  dataset = result;
+                });
             } catch {
                 throw new InsightError(
                     "Error: Problem processing the data zip. Ensure the content given" +
@@ -82,38 +84,43 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     // Todo: <PROJECT_DIRECTORY>/DATA
-    private processZipContent(id: string, content: string, kind: InsightDatasetKind): Dataset {
+    // TODO: Add guard
+    private processZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
+      return new Promise((resolve, reject) => {
         let zipFile: JSZip = new JSZip();
-        let dataset: Dataset = new Dataset(id, kind);
         zipFile
             .loadAsync(content, { base64: true })
             .then((files) => {
+                let promises: Array<Promise<string>> = [];
                 files.folder("courses").forEach((file) => {
-                    if (true
-
-                    ) {
-                        files
+                        promises.push(files
                             .folder("courses")
                             .file(file)
                             .async("text")
-                            .then((result: string) => {
-                                Log.info(103);
-                                let jsonFile = JSON.parse(result);
-                                let results = jsonFile["result"];
-                                Log.info("THE LENGTH " + results.length);
-                                for (let section of results) {
-                                    dataset.addSection(section);
-                                }
-                            });
-                    } else {
-                        throw new InsightError("Error: file is not valid JSON");
-                    }
+                            );
                 });
+
+                return Promise.all(promises);
+            }).then((sectionPromises: string[]) => {
+                  let dataset: Dataset = new Dataset(id, kind);
+                  sectionPromises.forEach((sectionPromise: string) => {
+                    let jsonFile = JSON.parse(sectionPromise);
+                    let results = jsonFile["result"];
+                    for (let section of results) {
+                        dataset.addSection(section);
+                    }
+                  });
+
+                  return dataset;
+            }).then((data: Dataset) => {
+              this.datasets.set(id, data);
+              resolve(data);
             })
+
             .catch((err) => {
-                return err;
+                reject(err);
             });
-        return dataset;
+          });
     }
 
     private processSection(object: string) {
@@ -134,25 +141,21 @@ export default class InsightFacade implements IInsightFacade {
                 reject(new InsightError("Invalid query name"));
             }
 
-            let content: string;
+            let content: Buffer;
+            let fileContent: string;
 
             try {
                 const filePath = path.join(
                     dataFolder,
                     "/" + dataSetName + ".zip",
                 );
-                content = fs.readFileSync(filePath).toString();
-            } catch {
+                content = fs.readFileSync(filePath);
+                fileContent = content.toString("base64");
+            } catch (err) {
                 reject(new InsightError("Unable to load file"));
             }
 
-            try {
-                let result = this.findQueryResults(query, dataSetName);
-                resolve(result);
-            } catch {
-                reject(new ResultTooLargeError());
-            }
-            this.addDataset(dataSetName, content, InsightDatasetKind.Courses)
+            this.addDataset(dataSetName, fileContent, InsightDatasetKind.Courses)
                 .catch((err: any) => {
                     if (!Array.from(this.datasets.keys()).includes(dataSetName)) {
                         reject(new InsightError("Invalid dataset"));
