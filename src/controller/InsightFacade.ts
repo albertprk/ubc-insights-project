@@ -25,7 +25,7 @@ import Dataset from "./Dataset";
 
 export default class InsightFacade implements IInsightFacade {
     public datasets: Map<string, Dataset>;
-    private dataFolder: string = path.join(__dirname, "/data");
+    private dataFolder: string = path.join(__dirname, "/../data");
     private dataSet: Dataset;
 
     constructor() {
@@ -130,7 +130,6 @@ export default class InsightFacade implements IInsightFacade {
 
     // TO DO: validQuery not catching everything
     public performQuery(query: any): Promise<any[]> {
-        let dataFolder: string = path.join(__dirname, "/data");
         return new Promise((resolve, reject) => {
             let validator: QueryValidator = new QueryValidator();
             const dataSetName: string = validator.determineDataset(query);
@@ -143,7 +142,7 @@ export default class InsightFacade implements IInsightFacade {
 
             try {
                 const filePath = path.join(
-                    dataFolder,
+                    this.dataFolder,
                     "/" + dataSetName + ".zip",
                 );
                 content = fs.readFileSync(filePath);
