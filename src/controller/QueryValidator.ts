@@ -179,26 +179,17 @@ export default class QueryValidator {
             return false;
         }
 
-        Object.keys(query).forEach((key: string) => {
-            if (key.toLowerCase() === "ORDER") {
-                result =
-                    result &&
-                    this.isValidOrder(query[key], dataset, columnValues);
-            }
-        });
+        if (typeof query["ORDER"] !== "undefined") {
+          result = result && this.isValidOrder(query["ORDER"], dataset, columnValues);
+        }
 
         return result;
     }
 
-    private isValidOrder(
-        query: any,
-        dataset: string,
-        columnValues: string[],
-    ): boolean {
-        if (
-            !(query instanceof String) ||
-            !columnValues.includes(query.toString())
-        ) {
+    private isValidOrder(query: any, dataset: string, columnValues: string[]): boolean {
+        if (!(typeof query === "string") || !columnValues.includes(query)) {
+            Log.info("String; " + !(typeof query === "string"));
+            Log.info("COLS: " + !columnValues.includes(query));
             return false;
         }
         return this.isValidKey(query.toString(), dataset);

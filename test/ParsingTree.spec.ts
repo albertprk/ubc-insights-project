@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import TreeNode from "../src/controller/TreeNode";
 import ParsingTree from "../src/controller/ParsingTree";
+import Log from "../src/Util";
 
 describe("ParsingTree: matchesTreeCriteria", function () {
     let parsingTree: ParsingTree;
@@ -245,7 +246,7 @@ describe("ParsingTree: reformattingSection", () => {
             Avg: 65.29,
             Campus: "ubc",
             Subject: "bota",
-            id: "304",
+            Course: "304",
             Year: 2020,
         };
 
@@ -267,7 +268,7 @@ describe("ParsingTree: reformattingSection", () => {
             Avg: 65.29,
             Campus: "ubc",
             Subject: "bota",
-            id: "304",
+            Course: "304",
             Year: 2020,
         };
 
@@ -276,6 +277,9 @@ describe("ParsingTree: reformattingSection", () => {
             courses_id: "304",
             courses_year: 1900,
         };
+
+        Log.info(2790);
+        Log.info(columns);
 
         expect(parsingTree.reformatSection(section, columns)).to.deep.equal(
             expected,

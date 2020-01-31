@@ -30,7 +30,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     // automatically be loaded in the 'before' hook.
     const datasetsToLoad: { [id: string]: string } = {
         courses: "./test/data/courses.zip",
-        unzippedFile: "./test/data/courses.zip",
+        unzippedFile: "./test/data/notAZipFile.txt",
         emptyFile: "./test/data/emptyZip.zip",
         secondCourses: "./test/data/courses2.zip",
         noCourses: "./test/data/emptyZip.zip",
@@ -81,7 +81,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 expect(result).to.deep.equal(expected);
             })
             .catch((err: any) => {
-                Log.trace(err);
                 expect.fail(err, expected, "Should not have rejected");
             });
     });
@@ -104,7 +103,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             .catch((err: any) => {
                 return expect(err).to.be.an.instanceOf(InsightError);
             })
-            .then((result: string[]) => {
+            .then((result2: string[]) => {
                 return insightFacade.addDataset(
                     id3,
                     datasets[id3],
@@ -119,8 +118,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 expect(result4.length).to.equal(expected.length);
             })
             .catch((err: any) => {
-                Log.trace(err);
-                expect.fail(err, expected, "Should not have rejected");
+                expect.fail(err, expected, "Should not have been rejected");
             });
     });
 
@@ -147,7 +145,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 expect(result4.length).to.equal(expected.length);
             })
             .catch((err: any) => {
-                Log.trace(err);
                 expect.fail(err, expected, "Should not have rejected");
             });
     });
@@ -176,6 +173,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 );
             })
             .catch((err: any) => {
+                // Log.trace(err);
                 expect.fail(err, expected, "Should not have rejected");
             })
             .then((res3: string[]) => {
@@ -226,6 +224,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 expect(result6.length).to.equal(0);
             })
             .catch((err: any) => {
+                // Log.trace(err);
+                // Log.info(err);
                 expect.fail(err, expected, "Should not have rejected");
             });
     });
@@ -268,7 +268,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         return insightFacade
             .addDataset(id, datasets["courses"], InsightDatasetKind.Courses)
             .then((result: string[]) => {
-                expect.fail(result, "Should not rejected");
+                expect.fail(result, "Should have been rejected");
             })
             .catch((err: any) => {
                 expect(err).to.be.an.instanceOf(InsightError);
@@ -302,6 +302,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 );
             })
             .then((result2: string[]) => {
+                Log.info(result2);
                 expect(result2).to.be.an.instanceOf(InsightError);
             })
             .catch((err: any) => {
@@ -425,46 +426,10 @@ describe("InsightFacade Add/Remove Dataset", function () {
             });
     });
 
-    it("removeDataSet Should fail due to invalid id", function () {
-        const id: string = "invalid_string";
-        return insightFacade
-            .removeDataset(id)
-            .then((result) => {
-                expect.fail(result, "Should not rejected");
-            })
-            .catch((err: any) => {
-                expect(err).to.be.an.instanceOf(InsightError);
-            });
-    });
-
-    it("removeDataSet Should fail due to an empty string id", function () {
-        const id: string = "      ";
-        return insightFacade
-            .removeDataset(id)
-            .then((result) => {
-                expect.fail(result, "Should not rejected");
-            })
-            .catch((err: any) => {
-                expect(err).to.be.an.instanceOf(InsightError);
-            });
-    });
-
     it("removeDataSet Should fail due to null id", function () {
         const id: string = null;
         return insightFacade
-            .removeDataset(id)
-            .then((result) => {
-                expect.fail(result, "Should not rejected");
-            })
-            .catch((err: any) => {
-                expect(err).to.be.an.instanceOf(InsightError);
-            });
-    });
-
-    it("removeDataSet Should fail due to an empty string id", function () {
-        const id: string = "";
-        return insightFacade
-            .removeDataset(id)
+            .removeDataset(null)
             .then((result) => {
                 expect.fail(result, "Should not rejected");
             })
@@ -618,7 +583,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
  * This test suite dynamically generates tests from the JSON files in test/queries.
  * You should not need to modify it; instead, add additional files to the queries directory.
  * You can still make tests the normal way, this is just a convenient tool for a majority of queries.
- */
+//  */
 describe("InsightFacade PerformQuery", () => {
     const datasetsToQuery: {
         [id: string]: { path: string; kind: InsightDatasetKind };

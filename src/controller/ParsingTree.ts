@@ -191,7 +191,6 @@ export default class ParsingTree {
             for (let col of columns) {
                 const key: string = col.split("_")[1];
 
-                // TODO: EDIT TO MATCH ALBERT's IMPLEMENTATION
                 if (typeof section[this.MFIELD_MAP[key]] !== "undefined" && key === "year") {
                     reformattedSection[col] =
                         key === "year" && section["Section"] === "overall"
@@ -209,7 +208,6 @@ export default class ParsingTree {
             }
             return reformattedSection;
         } catch {
-            Log.info("BAD BAd BAD");
             return null;
         }
     }
