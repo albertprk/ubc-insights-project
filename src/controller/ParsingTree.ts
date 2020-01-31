@@ -75,7 +75,7 @@ export default class ParsingTree {
             // Log.info("is" + this.matchesIs(section, tree.children[0]));
             return this.matchesIs(section, tree.children[0]);
         } else {
-          return false;
+            return false;
         }
 
         return result;
@@ -191,17 +191,25 @@ export default class ParsingTree {
             for (let col of columns) {
                 const key: string = col.split("_")[1];
 
-                if (typeof section[this.MFIELD_MAP[key]] !== "undefined" && key === "year") {
+                if (
+                    typeof section[this.MFIELD_MAP[key]] !== "undefined" &&
+                    key === "year"
+                ) {
                     reformattedSection[col] =
                         key === "year" && section["Section"] === "overall"
                             ? 1900
                             : parseInt(section[this.MFIELD_MAP[key]], 10);
-                } else if (typeof section[this.MFIELD_MAP[key]] !== "undefined") {
+                } else if (
+                    typeof section[this.MFIELD_MAP[key]] !== "undefined"
+                ) {
                     reformattedSection[col] = section[this.MFIELD_MAP[key]];
-                } else if (typeof section[this.SFIELD_MAP[key]] !== "undefined") {
-                    reformattedSection[col] = (key === "uuid") ?
-                                              section[this.SFIELD_MAP[key]].toString() :
-                                              section[this.SFIELD_MAP[key]];
+                } else if (
+                    typeof section[this.SFIELD_MAP[key]] !== "undefined"
+                ) {
+                    reformattedSection[col] =
+                        key === "uuid"
+                            ? section[this.SFIELD_MAP[key]].toString()
+                            : section[this.SFIELD_MAP[key]];
                 } else {
                     return null;
                 }

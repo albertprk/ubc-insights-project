@@ -1,0 +1,35 @@
+{
+    "title": "SELECT dept, avg WHERE avg > 97",
+    "query": {
+  "WHERE": {
+    "AND": [
+      {
+        "LT": {
+          "courses_avg": 60
+        }
+      },
+      {
+        "IS": {
+          "courses_dept": "a*"
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg",
+      "courses_fail",
+      "courses_pass",
+      "courses_audit",
+      "courses_year",
+      "courses_id",
+      "courses_instructor",
+      "courses_title",
+      "courses_uuid"
+    ],
+    "ORDER": "courses_dept"
+  }
+},
+    "isQueryValid": true,
+    "result":[{"courses_dept":"apbi","courses_avg":52.08,"courses_fail":5,"courses_pass":8,"courses_audit":0,"courses_year":1900,"courses_id":"351","courses_instructor":"","courses_title":"plnt phys","courses_uuid":"87343"},{"courses_dept":"apbi","courses_avg":52.08,"courses_fail":5,"courses_pass":8,"courses_audit":0,"courses_year":2014,"courses_id":"351","courses_instructor":"mansfield, shawn","courses_title":"plnt phys","courses_uuid":"87342"},{"courses_dept":"apbi","courses_avg":59.31,"courses_fail":33,"courses_pass":134,"courses_audit":0,"courses_year":2010,"courses_id":"200","courses_instructor":"krzic, maja","courses_title":"intr soil scie","courses_uuid":"61502"},{"courses_dept":"apsc","courses_avg":59.23,"courses_fail":10,"courses_pass":12,"courses_audit":0,"courses_year":2008,"courses_id":"201","courses_instructor":"","courses_title":"technical commun","courses_uuid":"97877"},{"courses_dept":"apsc","courses_avg":57.81,"courses_fail":12,"courses_pass":15,"courses_audit":0,"courses_year":2007,"courses_id":"201","courses_instructor":"berndt, annette","courses_title":"technical commun","courses_uuid":"18685"},{"courses_dept":"apsc","courses_avg":57.68,"courses_fail":8,"courses_pass":20,"courses_audit":0,"courses_year":2007,"courses_id":"201","courses_instructor":"berndt, annette","courses_title":"technical commun","courses_uuid":"18672"},{"courses_dept":"asia","courses_avg":57.33,"courses_fail":10,"courses_pass":33,"courses_audit":1,"courses_year":2015,"courses_id":"101","courses_instructor":"lovins, christopher","courses_title":"intr modern asia","courses_uuid":"39392"}]}

@@ -3,19 +3,11 @@ import * as fs from "fs";
 import * as fsExtra from "fs-extra";
 import * as path from "path";
 import * as JSZip from "jszip";
-import {
-    IInsightFacade,
-    InsightDataset,
-    InsightDatasetKind,
-} from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import QueryValidator from "./QueryValidator";
 import ParsingTree from "./ParsingTree";
 import TreeNode from "./TreeNode";
-import {
-    InsightError,
-    NotFoundError,
-    ResultTooLargeError,
-} from "./IInsightFacade";
+import {InsightError, NotFoundError, ResultTooLargeError} from "./IInsightFacade";
 import Dataset from "./Dataset";
 
 /**
@@ -30,28 +22,34 @@ export default class InsightFacade implements IInsightFacade {
 
     constructor() {
         try {
-          fsExtra.removeSync(this.dataFolder);
-          fs.mkdirSync(this.dataFolder);
+            fsExtra.removeSync(this.dataFolder);
+            fs.mkdirSync(this.dataFolder);
         } catch (err) {
-          Log.error(err);
+            Log.error(err);
         }
         this.datasets = new Map();
         Log.trace("InsightFacadeImpl::init()");
     }
 
     private loadDatasetsFromMemory(): Promise<string[][]> {
-      const allFiles = fs.readdirSync(this.dataFolder);
-      let promises: Array<Promise<string[]>> = [];
-      allFiles.forEach((file) => {
-        const content = fs.readFileSync(path.join(this.dataFolder, "/", file));
-        const index: number = file.indexOf(".zip");
-        promises.push(
-          this.addDataset(file.substring(0, index), content.toString("base64"), InsightDatasetKind.Courses));
-      });
+        const allFiles = fs.readdirSync(this.dataFolder);
+        let promises: Array<Promise<string[]>> = [];
+        allFiles.forEach((file) => {
+            const content = fs.readFileSync(
+                path.join(this.dataFolder, "/", file),
+            );
+            const index: number = file.indexOf(".zip");
+            promises.push(
+                this.addDataset(file.substring(0, index),
+                    content.toString("base64"),
+                    InsightDatasetKind.Courses,
+                ),
+            );
+        });
 
-      return new Promise((resolve, reject) => {
-        resolve(Promise.all(promises));
-      });
+        return new Promise((resolve, reject) => {
+            resolve(Promise.all(promises));
+        });
     }
 
     // If it's an invalid dataset then JSZip will throw an error
@@ -61,8 +59,7 @@ export default class InsightFacade implements IInsightFacade {
         if (id === null || typeof id === "undefined" || content === null || typeof content === "undefined" ||
             kind === null || typeof kind === "undefined") {
             return new Promise((resolve, reject) => {
-                reject(new InsightError("Error: function parameters can not be null or undefined")
-                );
+                reject(new InsightError("Error: function parameters can not be null or undefined"));
             });
         }
         if (id.includes("_") || id.trim().length === 0) {
@@ -72,139 +69,179 @@ export default class InsightFacade implements IInsightFacade {
         }
         if (Array.from(Object.keys(this.datasets)).includes(id)) {
             return new Promise((resolve, reject) => {
-                reject(new InsightError(
-                        "Error: A dataset with the given ID has already been added."));
+                reject(new InsightError("Error: A dataset with the given ID has already been added."));
             });
         }
         if (kind === InsightDatasetKind.Rooms) {
             return new Promise((resolve, reject) => {
-                reject(new InsightError(
-                        "Error: InsightDatasetKind of rooms is not currently supported"));
+                reject(new InsightError("Error: InsightDatasetKind of rooms is not currently supported"));
             });
         }
-
         let filePath: string = path.join(this.dataFolder, "/" + id + ".zip");
         if (fs.existsSync(filePath)) {
-          return new Promise((resolve, reject) => {
-              reject(new InsightError("Error: Already exists"));
-          });
-        }
-
-        if (typeof this.datasets.get(id) === "undefined" && !fs.existsSync(filePath)) {
-          fs.writeFile(filePath, content, "base64", (err) => {
-            if (err) {
-              return new Promise((resolve, reject) => {
-                reject(new InsightError("Unable to persist dataset"));
+            return new Promise((resolve, reject) => {
+                reject(new InsightError("Error: Already exists"));
             });
-          }
-        });
+        }
+        if (typeof this.datasets.get(id) === "undefined" && !fs.existsSync(filePath)) {
+            fs.writeFile(filePath, content, "base64", (err) => {
+                if (err) {
+                    return new Promise((resolve, reject) => {
+                        reject(new InsightError("Unable to persist dataset"));
+                    });
+                }
+            });
         }
 
         return new Promise((resolve, reject) => {
-            this.processZipContent(id, content, kind).then((result) => {
-                resolve(result);
-              }).catch((err) => {
-                reject(new InsightError(
-                          "Error: Problem processing the data zip. Ensure the content given" +
-                          "is a valid ZIP file."));
-              });
+            this.processZipContent(id, content, kind)
+                .then((result) => {
+                    resolve(result);
+                })
+                .catch((err) => {
+                    reject(
+                        new InsightError(
+                            "Error: Problem processing the data zip. Ensure the content given" +
+                                "is a valid ZIP file.")
+                    );
+                });
         });
     }
 
-    // Todo: <PROJECT_DIRECTORY>/DATA
-    // TODO: Add guard
+    // Todo: Check that JSON contains all the necessary keys
     private processZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-      return new Promise((resolve, reject) => {
-        let zipFile: JSZip = new JSZip();
-        zipFile
-            .loadAsync(content, { base64: true })
-            .then((files) => {
-                let promises: Array<Promise<string>> = [];
-                files.folder("courses").forEach((file) => {
-                        promises.push(files
-                            .folder("courses")
-                            .file(file)
-                            .async("text")
-                            );
-                });
-                return Promise.all(promises);
-            }).then((sectionPromises: string[]) => {
-                  if (sectionPromises.length === 0) {
-                    reject(new InsightError("No courses files in dataset."));
-                  }
-
-                  let dataset: Dataset = new Dataset(id, kind);
-                  sectionPromises.forEach((sectionPromise: string) => {
-                    let jsonFile = JSON.parse(sectionPromise);
-                    let results = jsonFile["result"];
-                    for (let section of results) {
-                        dataset.addSection(section);
+        return new Promise((resolve, reject) => {
+            let zipFile: JSZip = new JSZip();
+            zipFile
+                .loadAsync(content, { base64: true })
+                .then((files) => {
+                    let promises: Array<Promise<string>> = [];
+                    files.folder("courses").forEach((file) => {
+                        promises.push(
+                            files
+                                .folder("courses")
+                                .file(file)
+                                .async("text"),
+                        );
+                    });
+                    return Promise.all(promises);
+                })
+                .then((sectionPromises: string[]) => {
+                    if (sectionPromises.length === 0) {
+                        reject(new InsightError("No courses files in dataset."));
                     }
-                  });
 
-                  return dataset;
-            }).then((data: Dataset) => {
-              this.datasets.set(id, data);
-              resolve(Array.from(this.datasets.keys()));
-            }).catch((err) => {
-                reject(new InsightError("Invalid file type."));
-            });
-          });
+                    let dataset: Dataset = new Dataset(id, kind);
+                    sectionPromises.forEach((sectionPromise: string) => {
+                        try {
+                            let jsonFile = JSON.parse(sectionPromise);
+                            let results = jsonFile["result"];
+                            for (let section of results) {
+                                if (this.isValidSection(section)) {
+                                    dataset.addSection(section);
+                                }
+                            }
+                        } catch (err) {
+                            Log.info("Caught invalid JSON file");
+                        }
+                    });
+
+                    if (dataset.sections.length === 0) {
+                        reject(new InsightError("No valid course sections"));
+                    }
+                    return dataset;
+                }).then((data: Dataset) => {
+                    this.datasets.set(id, data);
+                    resolve(Array.from(this.datasets.keys()));
+                }).catch((err) => {
+                    Log.trace(err);
+                    reject(new InsightError("Invalid file type."));
+                });
+        });
+    }
+
+    private isValidSection(section: any): boolean {
+        const keys: string[] = ["Avg", "Audit", "Fail", "Pass", "Subject", "Course",
+            "Professor", "Title", "id"];
+
+        for (let key of keys) {
+            if (typeof section[key] === "undefined") {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public removeDataset(id: string): Promise<string> {
-      return new Promise((resolve, reject) => {
-        if (id === null) {
-          reject(new InsightError("Invalid input: cannot have a null dataset"));
-        } else if (typeof this.datasets.get(id) === "undefined") {
-          reject(new NotFoundError("Unable to find error"));
-        }
+        return new Promise((resolve, reject) => {
+            if (id === null) {
+                reject(
+                    new InsightError("Invalid input: cannot have a null dataset")
+                );
+            } else if (typeof this.datasets.get(id) === "undefined") {
+                reject(new NotFoundError("Unable to find error"));
+            }
 
-        this.datasets.delete(id);
-        const file: string = path.join(this.dataFolder, "/" + id + ".zip");
+            this.datasets.delete(id);
+            const file: string = path.join(this.dataFolder, "/" + id + ".zip");
 
-        fs.unlink(file, (err) => {
-          if (err) {
-            reject(new InsightError("Unable to remove dataset"));
-          } else {
-            resolve(id);
-          }
+            fs.unlink(file, (err) => {
+                if (err) {
+                    reject(new InsightError("Unable to remove dataset"));
+                } else {
+                    resolve(id);
+                }
+            });
         });
-      });
     }
 
-    // TO DO: validQuery not catching everything
     public performQuery(query: any): Promise<any[]> {
         return new Promise((resolve, reject) => {
             let validator: QueryValidator = new QueryValidator();
             const dataSetName: string = validator.determineDataset(query);
-            let filePath: string = path.join(this.dataFolder, "/" + dataSetName + ".zip");
+            let filePath: string = path.join(
+                this.dataFolder,
+                "/" + dataSetName + ".zip",
+            );
             if (dataSetName === null || !validator.isValidQuery(query, dataSetName)) {
                 reject(new InsightError("Invalid query."));
             } else if (typeof this.datasets.get(dataSetName) === "undefined" &&
-            !fs.existsSync(filePath)) {
+                !fs.existsSync(filePath)) {
                 reject(new InsightError("Unable to find dataset"));
             }
 
             if (typeof this.datasets.get(dataSetName) === "undefined") {
-              const content = fs.readFileSync(filePath);
-              this.processZipContent(dataSetName, content.toString("base64"), InsightDatasetKind.Courses)
-                .then((result) => {
-                  resolve(this.findQueryResults(query, dataSetName));
-                }).catch((err) => {
-                  if (err instanceof ResultTooLargeError) {
-                    reject(new ResultTooLargeError());
-                  } else {
-                    reject(new InsightError("Unable to load file from memory"));
-                  }
-                });
+                const content = fs.readFileSync(filePath);
+                this.processZipContent(
+                    dataSetName,
+                    content.toString("base64"),
+                    InsightDatasetKind.Courses,
+                )
+                    .then((result) => {
+                        resolve(this.findQueryResults(query, dataSetName));
+                    })
+                    .catch((err) => {
+                        if (err instanceof ResultTooLargeError) {
+                            reject(new ResultTooLargeError());
+                        } else {
+                            reject(
+                                new InsightError(
+                                    "Unable to load file from memory",
+                                ),
+                            );
+                        }
+                    });
             } else {
-              try {
-                  const result: any[] = this.findQueryResults(query, dataSetName);
-                  resolve(result);
-              } catch {
-                  reject(new ResultTooLargeError());
-              }
+                try {
+                    const result: any[] = this.findQueryResults(
+                        query,
+                        dataSetName,
+                    );
+                    resolve(result);
+                } catch {
+                    reject(new ResultTooLargeError());
+                }
             }
         });
     }
@@ -227,16 +264,16 @@ export default class InsightFacade implements IInsightFacade {
 
     public listDatasets(): Promise<InsightDataset[]> {
         return new Promise((resolve, reject) => {
-          let results: InsightDataset[] = [];
+            let results: InsightDataset[] = [];
 
-          try {
-              this.datasets.forEach((value: Dataset, key: string) => {
-                results.push(value.insightDataset);
-              });
-              resolve(results);
-          } catch {
-            reject(new InsightError());
-          }
+            try {
+                this.datasets.forEach((value: Dataset, key: string) => {
+                    results.push(value.insightDataset);
+                });
+                resolve(results);
+            } catch {
+                reject(new InsightError());
+            }
         });
     }
 }
