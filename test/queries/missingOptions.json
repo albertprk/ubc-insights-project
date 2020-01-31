@@ -1,0 +1,21 @@
+{
+    "title": "Unexpected response status 400: Missing OPTIONS",
+    "query": {
+  "WHERE": {
+    "AND": [
+      {
+        "IS": {
+          "courses_dept": "*b"
+        }
+      },
+      {
+        "IS": {
+          "courses_dept": "a*"
+        }
+      }
+    ]
+  }
+},
+    "isQueryValid": false,
+    "result": "InsightError"
+}

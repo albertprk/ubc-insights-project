@@ -1,0 +1,28 @@
+{
+    "title": "SELECT dept 'Z*', avg WHERE avg < 84",
+    "query": {
+        "WHERE": {
+          "AND": [
+            {
+              "LT": {
+                "courses_avg" : 84
+                }
+            },
+            {
+                "IS": {
+                  "courses_dept": "z*"
+                }
+              }
+          ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"zool","courses_avg":83.67}]
+}

@@ -1,0 +1,32 @@
+{
+    "title": "SELECT dept 'A*' AND '*B', avg WHERE avg < 84",
+    "query": {
+        "WHERE": {
+          "AND": [
+            {
+              "IS": {
+                "courses_dept" : "*b"
+                }
+            },
+            {
+                "IS": {
+                  "courses_dept": "a*"
+                }
+              }
+          ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+              "courses_dept",
+              "courses_avg",
+              "courses_fail",
+              "courses_pass",
+              "courses_audit",
+              "courses_year"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"aanb","courses_avg":87.83,"courses_fail":0,"courses_pass":6,"courses_audit":0,"courses_year":2015}, {"courses_dept":"aanb","courses_avg":87.83,"courses_fail":0,"courses_pass":6,"courses_audit":0,"courses_year":1900}, {"courses_dept":"aanb","courses_avg":94.44,"courses_fail":0,"courses_pass":9,"courses_audit":9,"courses_year":2015},
+      {"courses_dept":"aanb","courses_avg":94.44,"courses_fail":0,"courses_pass":9,"courses_audit":9,"courses_year":1900}]}

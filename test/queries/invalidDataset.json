@@ -1,0 +1,38 @@
+{
+    "title": "Unexpected response status 400: Referenced dataset co not added yet",
+    "query": {
+  "WHERE": {
+    "OR": [
+      {
+        "AND": [
+          {
+            "GT": {
+              "courses_avg": 90
+            }
+          },
+          {
+            "IS": {
+              "courses_dept": "adhe"
+            }
+          }
+        ]
+      },
+      {
+        "EQ": {
+          "courses_avg": 95
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "co_urses_dept",
+      "co_urses_id",
+      "co_urses_avg"
+    ],
+    "ORDER": "co_urses_avg"
+  }
+},
+    "isQueryValid": false,
+    "result": "InsightError"
+}

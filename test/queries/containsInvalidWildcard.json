@@ -1,0 +1,33 @@
+{
+    "title": "Unexpected response status 400: Asterisks (*) can only be the first or last characters of input strings",
+    "query": {
+  "WHERE": {
+    "AND": [
+      {
+        "LT": {
+          "courses_avg": 88.1
+        }
+      },
+      {
+        "GT": {
+          "courses_avg": 88
+        }
+      },
+      {
+        "IS" : {
+          "courses_dept": "a*a"
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+},
+    "isQueryValid": false,
+    "result": "InsightError"
+}

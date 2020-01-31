@@ -1,0 +1,38 @@
+{
+    "title": "Unexpected response status 400: Invalid key courses_department in COLUMNS",
+    "query": {
+  "WHERE": {
+    "OR": [
+      {
+        "AND": [
+          {
+            "GT": {
+              "courses_avg": 90
+            }
+          },
+          {
+            "IS": {
+              "courses_dept": "adhe"
+            }
+          }
+        ]
+      },
+      {
+        "EQ": {
+          "courses_avg": 95
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_department",
+      "courses_id",
+      "courses_avg"
+    ],
+    "ORDER": "courses_avg"
+  }
+},
+    "isQueryValid": false,
+    "result": "InsightError"
+}

@@ -1,0 +1,37 @@
+{
+    "title": "SELECT dept 'aanb', avg WHERE avg < 90",
+    "query": {
+        "WHERE": {
+          "AND": [
+            {
+              "LT": {
+                "courses_avg" : 90
+                }
+            },
+            {
+                "IS": {
+                  "courses_dept":"aanb"
+                }
+              }
+          ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+              "courses_dept",
+              "courses_avg",
+              "courses_fail",
+              "courses_pass",
+              "courses_audit",
+              "courses_year",
+              "courses_id",
+              "courses_instructor",
+              "courses_title",
+              "courses_uuid"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"aanb","courses_avg":87.83,"courses_fail":0,"courses_pass":6,"courses_audit":0,"courses_year":2015,"courses_id":"551","courses_instructor":"","courses_title":"anml welf rsrch","courses_uuid":"31381"},
+    {"courses_dept":"aanb","courses_avg":87.83,"courses_fail":0,"courses_pass":6,"courses_audit":0,"courses_year":1900,"courses_id":"551","courses_instructor":"","courses_title":"anml welf rsrch","courses_uuid":"31382"}]
+}
