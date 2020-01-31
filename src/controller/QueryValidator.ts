@@ -180,13 +180,19 @@ export default class QueryValidator {
         }
 
         if (typeof query["ORDER"] !== "undefined") {
-          result = result && this.isValidOrder(query["ORDER"], dataset, columnValues);
+            result =
+                result &&
+                this.isValidOrder(query["ORDER"], dataset, columnValues);
         }
 
         return result;
     }
 
-    private isValidOrder(query: any, dataset: string, columnValues: string[]): boolean {
+    private isValidOrder(
+        query: any,
+        dataset: string,
+        columnValues: string[],
+    ): boolean {
         if (!(typeof query === "string") || !columnValues.includes(query)) {
             Log.info("String; " + !(typeof query === "string"));
             Log.info("COLS: " + !columnValues.includes(query));

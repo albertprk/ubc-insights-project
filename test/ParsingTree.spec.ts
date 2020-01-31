@@ -278,9 +278,6 @@ describe("ParsingTree: reformattingSection", () => {
             courses_year: 1900,
         };
 
-        Log.info(2790);
-        Log.info(columns);
-
         expect(parsingTree.reformatSection(section, columns)).to.deep.equal(
             expected,
         );
@@ -374,5 +371,163 @@ describe("ParsingTree: reformattingSection", () => {
         expect(parsingTree.sortSections(sections, query)).to.deep.equal(
             expected,
         );
+    });
+});
+
+describe("ParsingTree: Sorting sections", () => {
+    let results;
+    let sections: any[];
+    let query: any;
+    let parsingTree: ParsingTree;
+
+    beforeEach(() => {
+        parsingTree = new ParsingTree();
+        sections = [
+            {
+                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
+                courses_title: "plnt phys", courses_uuid: "4205",
+            },
+            {
+                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 2014, courses_id: "352",
+                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_uuid: "41155",
+            }
+        ];
+        query = {
+            WHERE: {
+                AND: [{ LT: { courses_avg: 90 } },
+                { IS: { courses_dept: "aanb" } }]
+            }, OPTIONS: {
+                COLUMNS: [
+                    "courses_dept",
+                    "courses_avg",
+                    "courses_fail",
+                    "courses_pass",
+                    "courses_audit",
+                    "courses_year",
+                    "courses_id",
+                    "courses_instructor",
+                    "courses_title",
+                    "courses_uuid"
+                ],
+                ORDER: "courses_dept"
+            }
+        };
+    });
+
+    it("Should sort by dept", () => {
+        query["OPTIONS"]["ORDER"] = "courses_dept";
+        let result = [
+            {
+                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 2014, courses_id: "352",
+                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_uuid: "41155",
+            },
+            {
+                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
+                courses_title: "plnt phys", courses_uuid: "4205",
+            }
+        ];
+        let sortedSection = parsingTree.sortSections(sections, query);
+        expect(sortedSection).to.deep.equal(result);
+    });
+
+    it("Should sort with no order", () => {
+        let insideQuery = {
+            WHERE: {
+                AND: [{ LT: { courses_avg: 90 } },
+                { IS: { courses_dept: "aanb" } }]
+            }, OPTIONS: {
+                COLUMNS: [
+                    "courses_dept",
+                    "courses_avg",
+                    "courses_fail",
+                    "courses_pass",
+                    "courses_audit",
+                    "courses_year",
+                    "courses_id",
+                    "courses_instructor",
+                    "courses_title",
+                    "courses_uuid"
+                ]
+            }
+        };
+
+        let result = [
+            {
+                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 2014, courses_id: "352",
+                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_uuid: "41155",
+            },
+            {
+                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
+                courses_title: "plnt phys", courses_uuid: "4205",
+            }
+        ];
+        let sortedSection = parsingTree.sortSections(sections, query);
+        expect(sortedSection).to.deep.equal(result);
+    });
+
+    it("Should sort by instructor", () => {
+        query["OPTIONS"]["ORDER"] = "courses_instructor";
+        let sortedSection = parsingTree.sortSections(sections, query);
+        let result = [
+            {
+                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
+                courses_title: "plnt phys", courses_uuid: "4205"
+            },
+            {
+                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 2014, courses_id: "352",
+                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_uuid: "41155",
+            }
+        ];
+        expect(sortedSection).to.deep.equal(result);
+    });
+
+    it("Should sort by uuid", () => {
+        query["OPTIONS"]["ORDER"] = "courses_uuid";
+        let sortedSection = parsingTree.sortSections(sections, query);
+        let result = [
+            {
+                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 2014, courses_id: "352",
+                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_uuid: "41155",
+            },
+            {
+                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
+                courses_title: "plnt phys", courses_uuid: "4205",
+            }
+        ];
+        expect(sortedSection).to.deep.equal(result);
+    });
+
+    it("Should sort by year", () => {
+        query["OPTIONS"]["ORDER"] = "courses_year";
+        let sortedSection = parsingTree.sortSections(sections, query);
+        let result = [
+            {
+                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
+                courses_title: "plnt phys", courses_uuid: "4205",
+            },
+            {
+                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 2014, courses_id: "352",
+                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_uuid: "41155",
+            }
+        ];
+        expect(sortedSection).to.deep.equal(result);
     });
 });

@@ -33,7 +33,12 @@ describe("InsightFacade Add/Remove Dataset", function () {
         unzippedFile: "./test/data/notAZipFile.txt",
         emptyFile: "./test/data/emptyZip.zip",
         secondCourses: "./test/data/courses2.zip",
-        noCourses: "./test/data/emptyZip.zip",
+        noCourses: "./test/data/noCourses.zip",
+        invalidJson: "./test/data/invalidJson.zip",
+        hasInvalidJson: "./test/data/hasInvalidJson.zip",
+        notInCourses: "./test/data/notInCourses.zip",
+        emptySections: "./test/data/onlyEmptySections.zip",
+        invalidSections: "./test/data/allInvalidSections.zip",
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -81,6 +86,72 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 expect(result).to.deep.equal(expected);
             })
             .catch((err: any) => {
+                expect.fail(err, expected, "Should not have rejected");
+            });
+    });
+
+    it("Should fail because files aren't in courses", function () {
+        const id: string = "notInCourses";
+        return insightFacade
+            .addDataset(id, datasets[id], InsightDatasetKind.Courses)
+            .then((result: string[]) => {
+                expect.fail(result, InsightError, "Should not have accepted");
+            })
+            .catch((err: any) => {
+                return expect(err).to.be.an.instanceOf(InsightError);
+            });
+    });
+
+    it("Should because all sections are missing one of the needed parsed values", function () {
+        const id: string = "invalidSections";
+        return insightFacade
+            .addDataset(id, datasets[id], InsightDatasetKind.Courses)
+            .then((result: string[]) => {
+                expect.fail(result, InsightError, "Should not have accepted");
+            })
+            .catch((err: any) => {
+                return expect(err).to.be.an.instanceOf(InsightError);
+            });
+    });
+
+    it("Should fail because all sections are empty", function () {
+        const id: string = "emptySections";
+        return insightFacade
+            .addDataset(id, datasets[id], InsightDatasetKind.Courses)
+            .then((result: string[]) => {
+                expect.fail(
+                    result,
+                    InsightError,
+                    "Should not have been accepted",
+                );
+            })
+            .catch((err: any) => {
+                return expect(err).to.be.an.instanceOf(InsightError);
+            });
+    });
+
+    it("Should fail because it only has invalid JSON", function () {
+        const id: string = "invalidJson";
+        return insightFacade
+            .addDataset(id, datasets[id], InsightDatasetKind.Courses)
+            .then((result: string[]) => {
+                expect.fail(result, InsightError, "Should not have accepted");
+            })
+            .catch((err: any) => {
+                return expect(err).to.be.an.instanceOf(InsightError);
+            });
+    });
+
+    it("Should pass because it only has one instance of invalid JSON", function () {
+        const id: string = "hasInvalidJson";
+        const expected: string[] = [id];
+        return insightFacade
+            .addDataset(id, datasets[id], InsightDatasetKind.Courses)
+            .then((result: string[]) => {
+                expect(result).to.deep.equal(expected);
+            })
+            .catch((err: any) => {
+                Log.trace(err);
                 expect.fail(err, expected, "Should not have rejected");
             });
     });
