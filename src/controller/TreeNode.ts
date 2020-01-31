@@ -10,6 +10,6 @@ export default class TreeNode {
     }
 
     public getValue(): any {
-      return this.value;
+        return this.value;
     }
 }

@@ -7,7 +7,7 @@ export default class Dataset {
 
     public constructor(id: string, kind: InsightDatasetKind) {
         this.sections = [];
-        this.insightDataset = {id: id, kind: kind, numRows: 0};
+        this.insightDataset = { id: id, kind: kind, numRows: 0 };
     }
 
     public addSection(section: any): void {
