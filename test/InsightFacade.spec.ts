@@ -90,6 +90,22 @@ describe("InsightFacade Add/Remove Dataset", function () {
             });
     });
 
+    it("Should fail because file is persisted to disk", function () {
+        const id: string = "courses";
+        const expected: string[] = [id];
+        return insightFacade
+            .addDataset(id, datasets[id], InsightDatasetKind.Courses)
+            .then((result: string[]) => {
+                return insightFacade.datasets.delete(id);
+            }).then((result2: boolean) => {
+                return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+            }).then((result3: string[]) => {
+              expect.fail(result3, InsightError, "Failed to catch insightError");
+            }).catch((err: any) => {
+                return expect(err).to.be.an.instanceOf(InsightError);
+            });
+    });
+
     it("Should fail because files aren't in courses", function () {
         const id: string = "notInCourses";
         return insightFacade
