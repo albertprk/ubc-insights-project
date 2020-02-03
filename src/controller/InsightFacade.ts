@@ -1,6 +1,5 @@
 import Log from "../Util";
 import * as fs from "fs";
-import * as fsExtra from "fs-extra";
 import * as path from "path";
 import * as JSZip from "jszip";
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
@@ -18,14 +17,16 @@ import Dataset from "./Dataset";
 
 export default class InsightFacade implements IInsightFacade {
     public datasets: Map<string, Dataset>;
-    private dataFolder: string = path.join(__dirname, "/../data");
+    private dataFolder: string;
 
     constructor() {
-        try {
-            fsExtra.removeSync(this.dataFolder);
-            fs.mkdirSync(this.dataFolder);
-        } catch (err) {
-            Log.error(err);
+        this.dataFolder = __dirname + "/../../data";
+        if (!fs.existsSync(this.dataFolder)) {
+            try {
+                fs.mkdirSync(this.dataFolder);
+            } catch (err) {
+                Log.error(err);
+            }
         }
         this.datasets = new Map();
         Log.trace("InsightFacadeImpl::init()");
