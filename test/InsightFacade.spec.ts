@@ -311,8 +311,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 expect(result6.length).to.equal(0);
             })
             .catch((err: any) => {
-                // Log.trace(err);
-                // Log.info(err);
                 expect.fail(err, expected, "Should not have rejected");
             });
     });
@@ -389,7 +387,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 );
             })
             .then((result2: string[]) => {
-                Log.info(result2);
                 expect(result2).to.be.an.instanceOf(InsightError);
             })
             .catch((err: any) => {
