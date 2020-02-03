@@ -737,7 +737,6 @@ describe("InsightFacade PerformQuery", () => {
                     insightFacade
                         .performQuery(test.query)
                         .then((result) => {
-                            Log.trace(result);
                             TestUtil.checkQueryResult(test, result, done);
                         })
                         .catch((err) => {

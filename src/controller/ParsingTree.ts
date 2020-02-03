@@ -201,7 +201,7 @@ export default class ParsingTree {
                 } else if (typeof section[this.SFIELD_MAP[key]] !== "undefined") {
                     reformattedSection[col] =
                         key === "uuid"
-                            ? section[this.SFIELD_MAP[key]]
+                            ? section[this.SFIELD_MAP[key]].toString()
                             : section[this.SFIELD_MAP[key]];
                 } else {
                     return null;
@@ -246,10 +246,7 @@ export default class ParsingTree {
     ): any[] {
         let result: any[] = [];
         for (let section of dataset.sections) {
-            // Log.info(section);
-            // Log.info("Criteria: " + this.meetsTreeCriteria(section, tree));
             if (this.meetsTreeCriteria(section, tree)) {
-                // Log.info("Met criteria");
                 result.push(this.reformatSection(section, columns));
                 if (result.length > 5000) {
                     throw new ResultTooLargeError();
