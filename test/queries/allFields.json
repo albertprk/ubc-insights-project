@@ -32,14 +32,6 @@
         }
     },
     "isQueryValid": true,
-    "result": [
-        {
-            "courses_dept": "aanb",
-            "courses_avg": 87.83
-        },
-        {
-            "courses_dept": "aanb",
-            "courses_avg": 87.83
-        }
-    ]
+    "result":[{"courses_dept":"aanb","courses_avg":87.83,"courses_fail":0,"courses_pass":6,"courses_audit":0,"courses_year":2015,"courses_id":"551","courses_instructor":"","courses_title":"anml welf rsrch","courses_uuid":"31381"},
+    {"courses_dept":"aanb","courses_avg":87.83,"courses_fail":0,"courses_pass":6,"courses_audit":0,"courses_year":1900,"courses_id":"551","courses_instructor":"","courses_title":"anml welf rsrch","courses_uuid":"31382"}]
 }

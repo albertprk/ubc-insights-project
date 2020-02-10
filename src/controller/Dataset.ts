@@ -1,25 +1,21 @@
-import {InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import Section from "./Section";
+import { InsightDataset, InsightDatasetKind } from "./IInsightFacade";
+import Log from "../Util";
 
 export default class Dataset {
-    public sections: Section[];
-    public id: string;
-    public kind: InsightDatasetKind;
-    public numRows: number;
+    public sections: any[];
+    public insightDataset: InsightDataset;
 
     public constructor(id: string, kind: InsightDatasetKind) {
         this.sections = [];
-        this.id = id;
-        this.kind = kind;
-        this.numRows = 0;
+        this.insightDataset = { id: id, kind: kind, numRows: 0 };
     }
 
-    public addSection(section: Section): void {
+    public addSection(section: any): void {
         this.sections.push(section);
-        this.numRows++;
+        this.insightDataset.numRows++;
     }
 
     public getNumRows() {
-        return this.numRows;
+        return this.insightDataset.numRows;
     }
 }
