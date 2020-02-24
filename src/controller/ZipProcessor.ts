@@ -58,7 +58,12 @@ export default class ZipProcessor {
     }
 
     public processRoomsZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<string> {
-        return Promise.resolve(null);
+        const parse5 = require("parse5");
+        return new Promise((resolve, reject) => {
+            const parsedHTML = parse5.parse(content);
+            Log.trace(parsedHTML);
+            resolve(null);
+        });
     }
 
     private isValidSection(section: any): boolean {
