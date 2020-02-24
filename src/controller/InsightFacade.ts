@@ -41,7 +41,8 @@ export default class InsightFacade implements IInsightFacade {
             );
             const index: number = file.indexOf(".zip");
             promises.push(
-                this.addDataset(file.substring(0, index),
+                this.addDataset(
+                    file.substring(0, index),
                     content.toString("base64"),
                     InsightDatasetKind.Courses,
                 ),
@@ -57,8 +58,8 @@ export default class InsightFacade implements IInsightFacade {
     // Todo: Check to see if there's at least one valid course section
     // Todo: Skip over invalid file
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-        if (id === null || typeof id === "undefined" || content === null || typeof content === "undefined" ||
-            kind === null || typeof kind === "undefined") {
+        if (id === null || typeof id === "undefined" || content === null ||
+            typeof content === "undefined" || kind === null || typeof kind === "undefined") {
             return new Promise((resolve, reject) => {
                 reject(new InsightError("Error: function parameters can not be null or undefined"));
             });
@@ -103,7 +104,8 @@ export default class InsightFacade implements IInsightFacade {
                     reject(
                         new InsightError(
                             "Error: Problem processing the data zip. Ensure the content given" +
-                                "is a valid ZIP file.")
+                                "is a valid ZIP file.",
+                        ),
                     );
                 });
         });
@@ -119,10 +121,7 @@ export default class InsightFacade implements IInsightFacade {
                     let promises: Array<Promise<string>> = [];
                     files.folder("courses").forEach((file) => {
                         promises.push(
-                            files
-                                .folder("courses")
-                                .file(file)
-                                .async("text"),
+                            files.folder("courses").file(file).async("text")
                         );
                     });
                     return Promise.all(promises);
@@ -151,10 +150,12 @@ export default class InsightFacade implements IInsightFacade {
                         reject(new InsightError("No valid course sections"));
                     }
                     return dataset;
-                }).then((data: Dataset) => {
+                })
+                .then((data: Dataset) => {
                     this.datasets.set(id, data);
                     resolve(Array.from(this.datasets.keys()));
-                }).catch((err) => {
+                })
+                .catch((err) => {
                     Log.trace(err);
                     reject(new InsightError("Invalid file type."));
                 });
@@ -162,8 +163,8 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     private isValidSection(section: any): boolean {
-        const keys: string[] = ["Avg", "Audit", "Fail", "Pass", "Subject", "Course",
-            "Professor", "Title", "id"];
+        const keys: string[] = ["Avg", "Audit", "Fail", "Pass", "Subject",
+            "Course", "Professor", "Title", "id"];
 
         for (let key of keys) {
             if (typeof section[key] === "undefined") {
@@ -178,7 +179,9 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((resolve, reject) => {
             if (id === null) {
                 reject(
-                    new InsightError("Invalid input: cannot have a null dataset")
+                    new InsightError(
+                        "Invalid input: cannot have a null dataset",
+                    ),
                 );
             } else if (typeof this.datasets.get(id) === "undefined") {
                 reject(new NotFoundError("Unable to find error"));
@@ -201,14 +204,13 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((resolve, reject) => {
             let validator: QueryValidator = new QueryValidator();
             const dataSetName: string = validator.determineDataset(query);
-            let filePath: string = path.join(
-                this.dataFolder,
-                "/" + dataSetName + ".zip",
-            );
-            if (dataSetName === null || !validator.isValidQuery(query, dataSetName)) {
+            let filePath: string = path.join(this.dataFolder, "/" + dataSetName + ".zip");
+            if (dataSetName === null || !QueryValidator.isValidQuery(query, dataSetName)) {
                 reject(new InsightError("Invalid query."));
-            } else if (typeof this.datasets.get(dataSetName) === "undefined" &&
-                !fs.existsSync(filePath)) {
+            } else if (
+                typeof this.datasets.get(dataSetName) === "undefined" &&
+                !fs.existsSync(filePath)
+            ) {
                 reject(new InsightError("Unable to find dataset"));
             }
 

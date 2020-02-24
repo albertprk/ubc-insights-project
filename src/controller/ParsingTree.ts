@@ -181,7 +181,10 @@ export default class ParsingTree {
         }
     }
 
-    public reformatSection(section: any, columns: string[]): Record<string, any> {
+    public reformatSection(
+        section: any,
+        columns: string[],
+    ): Record<string, any> {
         let reformattedSection: Record<string, any> = {};
 
         try {
@@ -196,9 +199,13 @@ export default class ParsingTree {
                         key === "year" && section["Section"] === "overall"
                             ? 1900
                             : parseInt(section[this.MFIELD_MAP[key]], 10);
-                } else if (typeof section[this.MFIELD_MAP[key]] !== "undefined") {
+                } else if (
+                    typeof section[this.MFIELD_MAP[key]] !== "undefined"
+                ) {
                     reformattedSection[col] = section[this.MFIELD_MAP[key]];
-                } else if (typeof section[this.SFIELD_MAP[key]] !== "undefined") {
+                } else if (
+                    typeof section[this.SFIELD_MAP[key]] !== "undefined"
+                ) {
                     reformattedSection[col] =
                         key === "uuid"
                             ? section[this.SFIELD_MAP[key]].toString()
@@ -222,15 +229,21 @@ export default class ParsingTree {
         }
 
         sections.sort((a: any, b: any) => {
-            if (typeof a[orderKey] === "string" && a[orderKey].toLowerCase() < b[orderKey].toLowerCase()) {
+            if (
+                typeof a[orderKey] === "string" &&
+                a[orderKey].toLowerCase() < b[orderKey].toLowerCase()
+            ) {
                 return -1;
-            } else if (typeof a[orderKey] === "string" && a[orderKey].toLowerCase() > b[orderKey].toLowerCase()) {
+            } else if (
+                typeof a[orderKey] === "string" &&
+                a[orderKey].toLowerCase() > b[orderKey].toLowerCase()
+            ) {
                 return 1;
             } else if (typeof a[orderKey] === "string") {
                 return 0;
             } else if (typeof a[orderKey] === "number") {
-              let result: number = a[orderKey] - b[orderKey];
-              return isNaN(a[orderKey]) ? 1 : (isNaN(result)) ? -1 : result;
+                let result: number = a[orderKey] - b[orderKey];
+                return isNaN(a[orderKey]) ? 1 : isNaN(result) ? -1 : result;
             } else {
                 return 1;
             }

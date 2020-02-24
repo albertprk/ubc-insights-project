@@ -97,11 +97,22 @@ describe("InsightFacade Add/Remove Dataset", function () {
             .addDataset(id, datasets[id], InsightDatasetKind.Courses)
             .then((result: string[]) => {
                 return insightFacade.datasets.delete(id);
-            }).then((result2: boolean) => {
-                return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-            }).then((result3: string[]) => {
-              expect.fail(result3, InsightError, "Failed to catch insightError");
-            }).catch((err: any) => {
+            })
+            .then((result2: boolean) => {
+                return insightFacade.addDataset(
+                    id,
+                    datasets[id],
+                    InsightDatasetKind.Courses,
+                );
+            })
+            .then((result3: string[]) => {
+                expect.fail(
+                    result3,
+                    InsightError,
+                    "Failed to catch insightError",
+                );
+            })
+            .catch((err: any) => {
                 return expect(err).to.be.an.instanceOf(InsightError);
             });
     });
@@ -676,6 +687,10 @@ describe("InsightFacade PerformQuery", () => {
             path: "./test/data/courses.zip",
             kind: InsightDatasetKind.Courses,
         },
+        rooms: {
+            path: "./test/data/rooms.zip",
+            kind: InsightDatasetKind.Rooms,
+        },
     };
     let insightFacade: InsightFacade;
     let testQueries: ITestQuery[] = [];
@@ -737,7 +752,8 @@ describe("InsightFacade PerformQuery", () => {
             for (const test of testQueries) {
                 it(`[${test.filename}] ${test.title}`, function (done) {
                     const resultChecker = TestUtil.getQueryChecker(test, done);
-                    insightFacade.performQuery(test.query)
+                    insightFacade
+                        .performQuery(test.query)
                         .then(resultChecker)
                         .catch(resultChecker);
                 });
