@@ -11,10 +11,7 @@ export default class OptionValidator {
                                  dataset: string,
                                  hasTransformations: boolean,
                                  transformationValues: string[]): boolean {
-        if (
-            !QueryValidator.isValidObject(query) ||
-            Object.keys(query).length < 1
-        ) {
+        if (!QueryValidator.isValidObject(query) || Object.keys(query).length < 1) {
             return false;
         }
 
@@ -32,11 +29,7 @@ export default class OptionValidator {
                 hasColumns = true;
                 result =
                     result &&
-                    this.isValidColumnsWithTransformations(
-                        query[key],
-                        dataset,
-                        transformationValues,
-                    );
+                    this.isValidColumnsWithTransformations(query[key], dataset, transformationValues);
             }
         }
 
@@ -62,12 +55,8 @@ export default class OptionValidator {
         dataset: string,
         transformationValues: string[],
     ) {
-        if (
-            query === null ||
-            typeof query === "undefined" ||
-            !Array.isArray(query) ||
-            query.length === 0
-        ) {
+        if (query === null || typeof query === "undefined" ||
+            !Array.isArray(query) || query.length === 0) {
             return false;
         }
 
@@ -88,10 +77,11 @@ export default class OptionValidator {
         dataset: string,
         columnValues: string[],
     ): boolean {
-        return (
-            this.isValidAnyKeyOrder(query, dataset, columnValues) ||
-            this.isValidDirectionOrder(query, dataset, columnValues)
-        );
+
+        let result: boolean = this.isValidAnyKeyOrder(query, dataset, columnValues) ||
+        this.isValidDirectionOrder(query, dataset, columnValues);
+
+        return result;
     }
 
     private static isValidAnyKeyOrder(
@@ -112,17 +102,17 @@ export default class OptionValidator {
     ): boolean {
         let result = true;
 
-        for (let key of Object.keys(dataset)) {
-            if (key === "dir") {
-                result = result && this.isValidDirection(query["dir"]);
-            } else if (key === "keys") {
-                result =
-                    result &&
-                    this.isValidSortKeys(query["keys"], dataset, columnValues);
-            } else {
-                return false;
-            }
-        }
+        Object.keys(query).forEach((key: any) => {
+          if (key === "dir") {
+              result = result && this.isValidDirection(query["dir"]);
+          } else if (key === "keys") {
+              result =
+                  result &&
+                  this.isValidSortKeys(query["keys"], dataset, columnValues);
+          } else {
+              result = false;
+          }
+        });
 
         return result;
     }
@@ -137,21 +127,22 @@ export default class OptionValidator {
         columnValues: string[],
     ): boolean {
         if (!Array.isArray(query) || query.length === 0) {
+            Log.info("Returning early false");
             return false;
         }
 
         let result: boolean = true;
 
-        for (let key in query) {
-            if (
-                !QueryValidator.isValidAnyKey(query[key], dataset) ||
-                !columnValues.includes(key)
-            ) {
-                return false;
-            }
-        }
+        query.forEach((key: string) => {
+          result = result && (QueryValidator.isValidAnyKey(key, dataset) ||
+          columnValues.includes(key));
 
-        return true;
+          Log.info("1: " + QueryValidator.isValidAnyKey(key, dataset));
+          Log.info("2: " + columnValues.includes(key));
+
+        });
+
+        return result;
     }
 
     private static getColumnValues(query: any): string[] {

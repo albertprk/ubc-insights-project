@@ -36,13 +36,16 @@ export default class QueryValidator {
         let result: boolean = true;
 
         try {
-            result =
-                result && BodyValidator.isValidBody(query["WHERE"], dataset);
+            result = result && BodyValidator.isValidBody(query["WHERE"], dataset);
+
+            Log.info("BODY: " + result);
 
             if (typeof query["TRANSFORMATIONS"] !== "undefined") {
                 result =
                     result && TransformationValidator.isValidTransformations(
                         query["TRANSFORMATIONS"], dataset);
+
+                Log.info("TRANSFORMATIONS: " + result);
 
                 if (!result) {
                     return false;
@@ -51,14 +54,16 @@ export default class QueryValidator {
                 const transformationValues: string[] = TransformationValidator.getTransformationValues(
                     query["TRANSFORMATIONS"],
                 );
+
+                Log.info("USING TRANSFORMATIONS");
+
                 result =
                     result && OptionValidator.isValidOptions(query["OPTIONS"],
                         dataset, true, transformationValues);
+                Log.info("OPTIONS: " + result);
             } else {
                 result =
-                    result &&
-                    OptionValidator.isValidOptions(query["OPTIONS"],
-                        dataset, false, []);
+                    result && OptionValidator.isValidOptions(query["OPTIONS"], dataset, false, []);
             }
         } catch {
             return false;
@@ -76,9 +81,12 @@ export default class QueryValidator {
 
     public static isValidAnyKey(anyKey: string, dataset: string): boolean {
         return (
-            this.isValidKey(anyKey, dataset) ||
-            TransformationValidator.isValidApplyKey(anyKey)
+            this.isValidKey(anyKey, dataset) || this.isValidApplyKey(anyKey)
         );
+    }
+
+    public static isValidApplyKey(applyKey: string): boolean {
+        return applyKey.length > 0 && !applyKey.includes("_");
     }
 
     public determineDataset(query: any): string {
