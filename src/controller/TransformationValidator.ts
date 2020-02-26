@@ -65,16 +65,27 @@ export default class ValidateTransformations {
             return false;
         }
 
+        let applyRules: string[] = [];
+
         let result = true;
 
         query.forEach((rule) => {
-          result = result && this.isValidApplyRule(rule, dataset);
+          let currentApplyRules: string[] = [];
+          result = result && this.isValidApplyRule(rule, dataset, currentApplyRules);
+
+          currentApplyRules.forEach((currentRule: string) => {
+            if (applyRules.includes(currentRule)) {
+              result = false;
+            }
+
+            applyRules.push(currentRule);
+          });
         });
 
         return result;
     }
 
-    private static isValidApplyRule(query: any, dataset: string): boolean {
+    private static isValidApplyRule(query: any, dataset: string, applyRules: string[]): boolean {
         if (!QueryValidator.isValidObject(query) || Object.keys(query).length !== 1) {
             return false;
         }
@@ -85,6 +96,7 @@ export default class ValidateTransformations {
           if (!QueryValidator.isValidApplyKey(key)) {
               result = false;
           } else {
+              applyRules.push(key);
               result = result && this.isValidApplyTokenObject(query[key], dataset);
           }
         });

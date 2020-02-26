@@ -8,14 +8,14 @@ export default class ParsingTree {
         Log.trace("ParsingTree::init()");
     }
 
-    // TODO: update map, Albert has already reformatted names. This isn't needed
-    // Also to do: section is a type, need to redo how to access
     public MFIELD_MAP: Record<string, string> = {
         avg: "Avg",
         pass: "Pass",
         fail: "Fail",
         audit: "Audit",
         year: "Year",
+        lat: "lat",
+        lon: "lon"
     };
 
     public SFIELD_MAP: Record<string, string> = {
@@ -24,6 +24,14 @@ export default class ParsingTree {
         instructor: "Professor",
         title: "Title",
         uuid: "id",
+        fullname: "fullname",
+        shortname: "shortname",
+        number: "number",
+        name: "name",
+        address: "address",
+        type: "type",
+        furniture: "furniture",
+        href: "href"
     };
 
     public createTreeNode(query: any): TreeNode {
