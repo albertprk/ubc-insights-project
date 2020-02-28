@@ -1,10 +1,12 @@
 import { expect } from "chai";
 import TreeNode from "../src/controller/TreeNode";
+import ReformattedDataset from "../src/controller/ReformattedDataset";
 import ParsingTree from "../src/controller/ParsingTree";
 import Log from "../src/Util";
 
 describe("ParsingTree: matchesTreeCriteria", function () {
     let parsingTree: ParsingTree;
+    let reformattedDataset: ReformattedDataset;
     let isNode: TreeNode;
     let courseNode: TreeNode;
     let yearNode: TreeNode;
@@ -14,6 +16,7 @@ describe("ParsingTree: matchesTreeCriteria", function () {
 
     beforeEach(function () {
         parsingTree = new ParsingTree();
+        reformattedDataset = new ReformattedDataset();
         isNode = new TreeNode("IS");
         andNode = new TreeNode("AND");
         orNode = new TreeNode("OR");
@@ -220,11 +223,13 @@ describe("ParsingTree: createParsingTree", () => {
 
 describe("ParsingTree: reformattingSection", () => {
     let parsingTree: ParsingTree;
+    let reformattedDataset: ReformattedDataset;
     let columns: string[];
 
     beforeEach(() => {
         parsingTree = new ParsingTree();
         columns = ["courses_dept", "courses_id", "courses_year"];
+        reformattedDataset = new ReformattedDataset();
     });
 
     it("Should return null, because fields are missing", () => {
@@ -236,7 +241,7 @@ describe("ParsingTree: reformattingSection", () => {
             Subject: "bota",
         };
 
-        expect(parsingTree.reformatSection(section, columns)).to.equal(null);
+        expect(reformattedDataset.reformatSection(section, columns)).to.equal(null);
     });
 
     it("Should return list because all values are present", () => {
@@ -256,7 +261,7 @@ describe("ParsingTree: reformattingSection", () => {
             courses_year: 2020,
         };
 
-        expect(parsingTree.reformatSection(section, columns)).to.deep.equal(
+        expect(reformattedDataset.reformatSection(section, columns)).to.deep.equal(
             expected,
         );
     });
@@ -278,7 +283,7 @@ describe("ParsingTree: reformattingSection", () => {
             courses_year: 1900,
         };
 
-        expect(parsingTree.reformatSection(section, columns)).to.deep.equal(
+        expect(reformattedDataset.reformatSection(section, columns)).to.deep.equal(
             expected,
         );
     });
@@ -286,11 +291,13 @@ describe("ParsingTree: reformattingSection", () => {
 
 describe("ParsingTree: reformattingSection", () => {
     let parsingTree: ParsingTree;
+    let reformattedDataset: ReformattedDataset;
     let query: any;
     let sections: any[];
 
     beforeEach(() => {
         parsingTree = new ParsingTree();
+        reformattedDataset = new ReformattedDataset();
         query = {
             WHERE: {
                 AND: [
@@ -323,7 +330,7 @@ describe("ParsingTree: reformattingSection", () => {
             { courses_dept: "bota", courses_id: "304", courses_year: 1900 },
             { courses_dept: "aadhe", courses_id: "304", courses_year: 2000 },
         ];
-        expect(parsingTree.sortSections(sections, query)).to.deep.equal(
+        expect(reformattedDataset.sortSections(sections, query)).to.deep.equal(
             expected,
         );
     });
@@ -338,7 +345,7 @@ describe("ParsingTree: reformattingSection", () => {
             { courses_dept: "bota", courses_id: "304", courses_year: 1900 },
             { courses_dept: "aadhe", courses_id: "304", courses_year: 2000 },
         ];
-        expect(parsingTree.sortSections(sections, query)).to.deep.equal(
+        expect(reformattedDataset.sortSections(sections, query)).to.deep.equal(
             expected,
         );
     });
@@ -346,12 +353,14 @@ describe("ParsingTree: reformattingSection", () => {
 
 describe("ParsingTree: Sorting sections", () => {
     let results;
+    let reformattedDataset: ReformattedDataset;
     let sections: any[];
     let query: any;
     let parsingTree: ParsingTree;
 
     beforeEach(() => {
         parsingTree = new ParsingTree();
+        reformattedDataset = new ReformattedDataset();
         sections = [
             {courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5,
                 courses_pass: 8,
@@ -424,7 +433,7 @@ describe("ParsingTree: Sorting sections", () => {
                 courses_uuid: "4205",
             },
         ];
-        let sortedSection = parsingTree.sortSections(sections, query);
+        let sortedSection = reformattedDataset.sortSections(sections, query);
         expect(sortedSection).to.deep.equal(result);
     });
 
@@ -474,13 +483,13 @@ describe("ParsingTree: Sorting sections", () => {
                 courses_uuid: "4205",
             },
         ];
-        let sortedSection = parsingTree.sortSections(sections, query);
+        let sortedSection = reformattedDataset.sortSections(sections, query);
         expect(sortedSection).to.deep.equal(result);
     });
 
     it("Should sort by instructor", () => {
         query["OPTIONS"]["ORDER"] = "courses_instructor";
-        let sortedSection = parsingTree.sortSections(sections, query);
+        let sortedSection = reformattedDataset.sortSections(sections, query);
         let result = [
             {
                 courses_dept: "apbi",
@@ -512,7 +521,7 @@ describe("ParsingTree: Sorting sections", () => {
 
     it("Should sort by uuid", () => {
         query["OPTIONS"]["ORDER"] = "courses_uuid";
-        let sortedSection = parsingTree.sortSections(sections, query);
+        let sortedSection = reformattedDataset.sortSections(sections, query);
         let result = [
             {
                 courses_dept: "apbc",
@@ -544,7 +553,7 @@ describe("ParsingTree: Sorting sections", () => {
 
     it("Should sort by year", () => {
         query["OPTIONS"]["ORDER"] = "courses_year";
-        let sortedSection = parsingTree.sortSections(sections, query);
+        let sortedSection = reformattedDataset.sortSections(sections, query);
         let result = [
             {
                 courses_dept: "apbi",

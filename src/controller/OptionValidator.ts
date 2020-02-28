@@ -7,6 +7,29 @@ export default class OptionValidator {
         Log.trace("OptionValidator::init()");
     }
 
+    public static FIELD_MAP: Record<string, string> = {
+        avg: "Avg",
+        pass: "Pass",
+        fail: "Fail",
+        audit: "Audit",
+        year: "Year",
+        lat: "lat",
+        lon: "lon",
+        dept: "Subject",
+        id: "Course",
+        instructor: "Professor",
+        title: "Title",
+        uuid: "id",
+        fullname: "fullname",
+        shortname: "shortname",
+        number: "number",
+        name: "name",
+        address: "address",
+        type: "type",
+        furniture: "furniture",
+        href: "href"
+    };
+
     public static isValidOptions(query: any,
                                  dataset: string,
                                  hasTransformations: boolean,
@@ -63,10 +86,14 @@ export default class OptionValidator {
         let result: boolean = true;
 
         query.forEach((val: string) => {
+            const index = val.indexOf("_");
+            let value: string = (typeof this.FIELD_MAP[val.substring(index + 1, val.length)] === "undefined") ?
+                val : this.FIELD_MAP[val.substring(index + 1, val.length)];
+
             result =
                 result &&
                 QueryValidator.isValidAnyKey(val, dataset) &&
-                transformationValues.includes(val);
+                transformationValues.includes(value);
         });
 
         return result;
@@ -127,7 +154,6 @@ export default class OptionValidator {
         columnValues: string[],
     ): boolean {
         if (!Array.isArray(query) || query.length === 0) {
-            Log.info("Returning early false");
             return false;
         }
 
@@ -136,10 +162,6 @@ export default class OptionValidator {
         query.forEach((key: string) => {
           result = result && (QueryValidator.isValidAnyKey(key, dataset) ||
           columnValues.includes(key));
-
-          Log.info("1: " + QueryValidator.isValidAnyKey(key, dataset));
-          Log.info("2: " + columnValues.includes(key));
-
         });
 
         return result;

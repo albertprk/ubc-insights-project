@@ -33,19 +33,17 @@ export default class QueryValidator {
             }
         }
 
+        Log.info("PASSED LOOP");
+
         let result: boolean = true;
 
         try {
             result = result && BodyValidator.isValidBody(query["WHERE"], dataset);
 
-            Log.info("BODY: " + result);
-
             if (typeof query["TRANSFORMATIONS"] !== "undefined") {
                 result =
                     result && TransformationValidator.isValidTransformations(
                         query["TRANSFORMATIONS"], dataset);
-
-                Log.info("TRANSFORMATIONS: " + result);
 
                 if (!result) {
                     return false;
@@ -55,17 +53,19 @@ export default class QueryValidator {
                     query["TRANSFORMATIONS"],
                 );
 
-                Log.info("USING TRANSFORMATIONS");
 
                 result =
                     result && OptionValidator.isValidOptions(query["OPTIONS"],
                         dataset, true, transformationValues);
-                Log.info("OPTIONS: " + result);
+
+                Log.info("AFTER OPTIONS: " + result);
             } else {
                 result =
                     result && OptionValidator.isValidOptions(query["OPTIONS"], dataset, false, []);
             }
-        } catch {
+        } catch (err) {
+            Log.info("CAUGHT ERROR");
+            Log.trace(err);
             return false;
         }
 
@@ -92,24 +92,40 @@ export default class QueryValidator {
     public determineDataset(query: any): string {
         if (!QueryValidator.isValidObject(query)) {
             return null;
-        }
-
-        try {
-            for (let options of Object.keys(query)) {
-                if (options === "OPTIONS") {
-                    for (let col of Object.keys(query[options])) {
-                        if (col === "COLUMNS") {
-                            let result: string = query[options][col][0];
-                            const index: number = result.indexOf("_");
-                            return index > 0
-                                ? result.substring(0, index)
-                                : null;
-                        }
-                    }
-                }
-            }
-        } catch {
-            return null;
+        } else if (typeof query["TRANSFORMATIONS"] !== "undefined") {
+          return this.getDatasetFromGroups(query);
+        } else {
+          return this.getDatasetFromColumn(query);
         }
     }
+
+    private getDatasetFromGroups(query: any): string {
+      try {
+        const firstKey = query["TRANSFORMATIONS"]["GROUP"][0];
+        const index = firstKey.indexOf("_");
+        return firstKey.substring(0, index);
+      } catch {
+        return null;
+      }
+    }
+
+    private getDatasetFromColumn(query: any): string {
+      try {
+          for (let options of Object.keys(query)) {
+              if (options === "OPTIONS") {
+                  for (let col of Object.keys(query[options])) {
+                      if (col === "COLUMNS") {
+                          let result: string = query[options][col][0];
+                          const index: number = result.indexOf("_");
+                          return index > 0
+                              ? result.substring(0, index)
+                              : null;
+                      }
+                  }
+              }
+          }
+      } catch {
+          return null;
+      }
+  }
 }

@@ -1,0 +1,36 @@
+{
+    "title": "Transform courses",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept": "aanb"
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "overallAvg"
+            ],
+            "ORDER": "courses_dept"
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "APPLY": [
+                {
+                    "overallAvg": {
+                        "AVG": "courses_avg"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"aanb","courses_avg":94.44,"overallAvg":94.44},{"courses_dept":"aanb","courses_avg":87.83,"overallAvg":87.83}]}

@@ -5,6 +5,7 @@ import * as JSZip from "jszip";
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import QueryValidator from "./QueryValidator";
 import ParsingTree from "./ParsingTree";
+import ReformattedDataset from "./ReformattedDataset";
 import TreeNode from "./TreeNode";
 import {InsightError, NotFoundError, ResultTooLargeError} from "./IInsightFacade";
 import Dataset from "./Dataset";
@@ -28,8 +29,13 @@ export default class InsightFacade implements IInsightFacade {
                 Log.error(err);
             }
         }
+
         this.datasets = new Map();
-        Log.trace("InsightFacadeImpl::init()");
+        this.loadDatasetsFromMemory().then((result) => {
+          Log.trace("InsightFacadeImpl::init()");
+        }).catch((err) => {
+          Log.error(err);
+        });
     }
 
     private loadDatasetsFromMemory(): Promise<string[][]> {
@@ -39,19 +45,44 @@ export default class InsightFacade implements IInsightFacade {
             const content = fs.readFileSync(
                 path.join(this.dataFolder, "/", file),
             );
-            const index: number = file.indexOf(".zip");
-            promises.push(
-                this.addDataset(
-                    file.substring(0, index),
-                    content.toString("base64"),
-                    InsightDatasetKind.Courses,
-                ),
-            );
+
+            this.findKind(content).then((kind) => {
+              const index: number = file.indexOf(".zip");
+              promises.push(
+                  this.processZipContent(
+                      file.substring(0, index), content.toString("base64"), kind)
+              );
+            });
         });
 
         return new Promise((resolve, reject) => {
             resolve(Promise.all(promises));
         });
+    }
+
+    private findKind(content: Buffer): Promise<InsightDatasetKind> {
+      return new Promise((resolve, reject) => {
+        let zipFile: JSZip = new JSZip();
+        zipFile.loadAsync(content, { base64: true }).then((files) => {
+              let result: InsightDatasetKind;
+
+              try {
+                files.folder("courses").forEach((file) => {
+                  throw new Error();
+                });
+
+                result = InsightDatasetKind.Rooms;
+              } catch {
+                result = InsightDatasetKind.Courses;
+              }
+
+              return result;
+            }).then((res) => {
+              resolve(res);
+            }).catch((err) => {
+              Log.error(err);
+            });
+      });
     }
 
     // If it's an invalid dataset then JSZip will throw an error
@@ -178,11 +209,7 @@ export default class InsightFacade implements IInsightFacade {
     public removeDataset(id: string): Promise<string> {
         return new Promise((resolve, reject) => {
             if (id === null) {
-                reject(
-                    new InsightError(
-                        "Invalid input: cannot have a null dataset",
-                    ),
-                );
+                reject(new InsightError("Invalid input: cannot have a null dataset"));
             } else if (typeof this.datasets.get(id) === "undefined") {
                 reject(new NotFoundError("Unable to find error"));
             }
@@ -205,60 +232,38 @@ export default class InsightFacade implements IInsightFacade {
             let validator: QueryValidator = new QueryValidator();
             const dataSetName: string = validator.determineDataset(query);
             let filePath: string = path.join(this.dataFolder, "/" + dataSetName + ".zip");
+
+            Log.info("VALID QUERY: " + QueryValidator.isValidQuery(query, dataSetName));
+
             if (dataSetName === null || !QueryValidator.isValidQuery(query, dataSetName)) {
                 reject(new InsightError("Invalid query."));
-            } else if (
-                typeof this.datasets.get(dataSetName) === "undefined" &&
-                !fs.existsSync(filePath)
-            ) {
-                reject(new InsightError("Unable to find dataset"));
+            } else if (typeof this.datasets.get(dataSetName) === "undefined" &&
+                !fs.existsSync(filePath)) {
+                  reject(new InsightError("Unable to find dataset"));
             }
 
-            if (typeof this.datasets.get(dataSetName) === "undefined") {
-                const content = fs.readFileSync(filePath);
-                this.processZipContent(
-                    dataSetName,
-                    content.toString("base64"),
-                    InsightDatasetKind.Courses,
-                )
-                    .then((result) => {
-                        resolve(this.findQueryResults(query, dataSetName));
-                    })
-                    .catch((err) => {
-                        if (err instanceof ResultTooLargeError) {
-                            reject(new ResultTooLargeError());
-                        } else {
-                            reject(
-                                new InsightError(
-                                    "Unable to load file from memory",
-                                ),
-                            );
-                        }
-                    });
-            } else {
-                try {
-                    const result: any[] = this.findQueryResults(
-                        query,
-                        dataSetName,
-                    );
-                    resolve(result);
-                } catch {
-                    reject(new ResultTooLargeError());
-                }
+            try {
+              const result: any[] = this.findQueryResults(query, dataSetName);
+              resolve(result);
+            } catch {
+              reject(new ResultTooLargeError());
             }
+
         });
     }
 
     private findQueryResults(query: any, dataSetName: string): any[] {
         try {
             let parsingTree: ParsingTree = new ParsingTree();
+            let reformattedDataset: ReformattedDataset = new ReformattedDataset();
             const tree: TreeNode = parsingTree.createTreeNode(query["WHERE"]);
             let result: any[] = parsingTree.searchSections(
                 this.datasets.get(dataSetName),
                 tree,
                 query["OPTIONS"]["COLUMNS"],
             );
-            result = parsingTree.sortSections(result, query);
+            result = reformattedDataset.reformatSections(result, query);
+            result = reformattedDataset.sortSections(result, query);
             return result;
         } catch {
             throw new ResultTooLargeError();

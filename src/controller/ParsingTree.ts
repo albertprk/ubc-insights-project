@@ -189,77 +189,6 @@ export default class ParsingTree {
         }
     }
 
-    public reformatSection(
-        section: any,
-        columns: string[],
-    ): Record<string, any> {
-        let reformattedSection: Record<string, any> = {};
-
-        try {
-            for (let col of columns) {
-                const key: string = col.split("_")[1];
-
-                if (
-                    typeof section[this.MFIELD_MAP[key]] !== "undefined" &&
-                    key === "year"
-                ) {
-                    reformattedSection[col] =
-                        key === "year" && section["Section"] === "overall"
-                            ? 1900
-                            : parseInt(section[this.MFIELD_MAP[key]], 10);
-                } else if (
-                    typeof section[this.MFIELD_MAP[key]] !== "undefined"
-                ) {
-                    reformattedSection[col] = section[this.MFIELD_MAP[key]];
-                } else if (
-                    typeof section[this.SFIELD_MAP[key]] !== "undefined"
-                ) {
-                    reformattedSection[col] =
-                        key === "uuid"
-                            ? section[this.SFIELD_MAP[key]].toString()
-                            : section[this.SFIELD_MAP[key]];
-                } else {
-                    return null;
-                }
-            }
-            return reformattedSection;
-        } catch {
-            return null;
-        }
-    }
-
-    public sortSections(sections: any[], query: any): any[] {
-        let orderKey: string;
-        if (typeof query["OPTIONS"]["ORDER"] !== "undefined") {
-            orderKey = query["OPTIONS"]["ORDER"];
-        } else {
-            return sections;
-        }
-
-        sections.sort((a: any, b: any) => {
-            if (
-                typeof a[orderKey] === "string" &&
-                a[orderKey].toLowerCase() < b[orderKey].toLowerCase()
-            ) {
-                return -1;
-            } else if (
-                typeof a[orderKey] === "string" &&
-                a[orderKey].toLowerCase() > b[orderKey].toLowerCase()
-            ) {
-                return 1;
-            } else if (typeof a[orderKey] === "string") {
-                return 0;
-            } else if (typeof a[orderKey] === "number") {
-                let result: number = a[orderKey] - b[orderKey];
-                return isNaN(a[orderKey]) ? 1 : isNaN(result) ? -1 : result;
-            } else {
-                return 1;
-            }
-        });
-
-        return sections;
-    }
-
     public searchSections(
         dataset: Dataset,
         tree: TreeNode,
@@ -268,7 +197,7 @@ export default class ParsingTree {
         let result: any[] = [];
         for (let section of dataset.sections) {
             if (this.meetsTreeCriteria(section, tree)) {
-                result.push(this.reformatSection(section, columns));
+                result.push(section);
                 if (result.length > 5000) {
                     throw new ResultTooLargeError();
                 }
@@ -277,4 +206,5 @@ export default class ParsingTree {
 
         return result;
     }
+
 }
