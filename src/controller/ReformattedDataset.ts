@@ -1,5 +1,6 @@
 import Log from "../Util";
 import FilterTree from "./FilterTree";
+import {Decimal} from "decimal.js";
 
 export default class ReformattedDataset {
     constructor() {
@@ -94,35 +95,55 @@ export default class ReformattedDataset {
     }
 
     public sortSections(sections: any[], query: any): any[] {
-        let orderKey: string;
-        if (typeof query["OPTIONS"]["ORDER"] !== "undefined") {
-            orderKey = query["OPTIONS"]["ORDER"];
-        } else {
+        let order = query["OPTIONS"]["ORDER"];
+        if (typeof order === "undefined") {
             return sections;
+        } else if  (typeof order === "string") {
+            return this.sortWithOrderString(sections, order);
+        } else {
+            return this.sortWithOrderObject(sections, order);
         }
+    }
 
-        sections.sort((a: any, b: any) => {
-            if (
-                typeof a[orderKey] === "string" &&
-                a[orderKey].toLowerCase() < b[orderKey].toLowerCase()
-            ) {
-                return -1;
-            } else if (
-                typeof a[orderKey] === "string" &&
-                a[orderKey].toLowerCase() > b[orderKey].toLowerCase()
-            ) {
-                return 1;
-            } else if (typeof a[orderKey] === "string") {
-                return 0;
-            } else if (typeof a[orderKey] === "number") {
-                let result: number = a[orderKey] - b[orderKey];
-                return isNaN(a[orderKey]) ? 1 : isNaN(result) ? -1 : result;
-            } else {
-                return 1;
-            }
+    private sortWithOrderString(sections: any[], order: string): any[] {
+        sections.sort((a, b) => {
+            return this.sortSectionHelper(a, b, order);
         });
 
         return sections;
+    }
+
+    private sortWithOrderObject(sections: any[], order: any): any[] {
+        sections.sort((a, b) => {
+            let result = 0;
+            let counter = 0;
+
+            while (result === 0 && counter < order["keys"].length)  {
+                if (order.length === 0) {
+                    return 0;
+                }
+
+                result = this.sortSectionHelper(a, b, order["keys"][counter]);
+                counter++;
+            }
+
+            result = (order["dir"] === "DOWN") ? result * (-1) : result;
+            return result;
+        });
+
+        return sections;
+    }
+
+    private sortSectionHelper(a: any, b: any, order: string): number {
+        if (typeof a[order] === "string" && a[order] < b[order]) {
+            return -1;
+        } else if (typeof a[order] === "string" && a[order] > b[order]) {
+            return 1;
+        } else if (typeof a[order] === "string") {
+            return 0;
+        } else {
+            return a[order] - b[order];
+        }
     }
 
     public reformatSection(
@@ -154,8 +175,10 @@ export default class ReformattedDataset {
                         key === "uuid"
                             ? section[this.SFIELD_MAP[key]].toString()
                             : section[this.SFIELD_MAP[key]];
-                } else {
+                } else if (col.indexOf("_") === -1) {
                     reformattedSection[col] = section[col];
+                } else {
+                    return null;
                 }
             }
             return reformattedSection;
@@ -202,33 +225,24 @@ export default class ReformattedDataset {
 
     private calculateAvg(sections: any[], value: any): number {
       let field = this.determineField(value);
-      let values: any[] = [];
-      Log.info("IN AVERAGE");
+      let total = new Decimal(0);
       sections.forEach((section) => {
-        values.push(section[field]);
+          total = Decimal.add(total, new Decimal(section[field]));
       });
 
-      let result = values.reduce((a, b) => {
-        return a + b;
-      },
-      0) / values.length;
-
-      Log.info("GOT RESULT");
-      return result;
+      let avg = total.toNumber() / sections.length;
+      return Number(avg.toFixed(2));
     }
 
     private calculateSum(sections: any[], value: any): number {
       let field = this.determineField(value);
-      let values: any[] = [];
+      let sum = 0;
 
       sections.forEach((section) => {
-        values.push(section[field]);
+        sum += section[field];
       });
 
-      return values.reduce((a, b) => {
-        return a + b;
-      },
-      0);
+      return Number(sum.toFixed(2));
     }
 
     private calculateMax(sections: any[], value: any): number {

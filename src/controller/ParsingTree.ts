@@ -39,6 +39,8 @@ export default class ParsingTree {
 
         if (typeof query === "string" || typeof query === "number") {
             return new TreeNode(query);
+        } else if (!Array.isArray(query) && typeof query === "object" && Object.keys(query).length === 0) {
+            return null;
         }
 
         const key: string = Object.keys(query)[0];
@@ -191,10 +193,14 @@ export default class ParsingTree {
 
     public searchSections(
         dataset: Dataset,
-        tree: TreeNode,
-        columns: string[],
+        tree: TreeNode
     ): any[] {
         let result: any[] = [];
+
+        if (tree === null) {
+            return dataset.sections;
+        }
+
         for (let section of dataset.sections) {
             if (this.meetsTreeCriteria(section, tree)) {
                 result.push(section);

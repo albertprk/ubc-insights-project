@@ -233,8 +233,6 @@ export default class InsightFacade implements IInsightFacade {
             const dataSetName: string = validator.determineDataset(query);
             let filePath: string = path.join(this.dataFolder, "/" + dataSetName + ".zip");
 
-            Log.info("VALID QUERY: " + QueryValidator.isValidQuery(query, dataSetName));
-
             if (dataSetName === null || !QueryValidator.isValidQuery(query, dataSetName)) {
                 reject(new InsightError("Invalid query."));
             } else if (typeof this.datasets.get(dataSetName) === "undefined" &&
@@ -243,10 +241,12 @@ export default class InsightFacade implements IInsightFacade {
             }
 
             try {
-              const result: any[] = this.findQueryResults(query, dataSetName);
-              resolve(result);
+                Log.info("ABOUT TO FIND QUERY RESULTS");
+                const result: any[] = this.findQueryResults(query, dataSetName);
+                Log.info("GOT QUERY RESULTS");
+                resolve(result);
             } catch {
-              reject(new ResultTooLargeError());
+                reject(new ResultTooLargeError());
             }
 
         });
@@ -258,14 +258,26 @@ export default class InsightFacade implements IInsightFacade {
             let reformattedDataset: ReformattedDataset = new ReformattedDataset();
             const tree: TreeNode = parsingTree.createTreeNode(query["WHERE"]);
             let result: any[] = parsingTree.searchSections(
-                this.datasets.get(dataSetName),
-                tree,
-                query["OPTIONS"]["COLUMNS"],
+                this.datasets.get(dataSetName),  tree
             );
+
+            if (result.length > 5000 && typeof query["TRANSFORMATIONS"] === "undefined") {
+                throw new ResultTooLargeError();
+            }
+
+            Log.info("SEARCHED SECTIONS");
             result = reformattedDataset.reformatSections(result, query);
+
+            if (result.length > 5000) {
+                throw new ResultTooLargeError();
+            }
+
+            Log.info("REFORMATTED SECTIONS");
             result = reformattedDataset.sortSections(result, query);
+            Log.info("SORTED SECTIONS");
             return result;
-        } catch {
+        } catch (err) {
+            Log.trace(err);
             throw new ResultTooLargeError();
         }
     }
