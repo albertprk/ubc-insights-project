@@ -2,6 +2,7 @@ import {InsightDatasetKind, InsightError} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import Dataset from "./Dataset";
 import Log from "../Util";
+import {stringify} from "querystring";
 
 
 export default class ZipProcessor {
@@ -57,13 +58,33 @@ export default class ZipProcessor {
         });
     }
 
-    public processRoomsZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<string> {
+    public processRoomsZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
         const parse5 = require("parse5");
         return new Promise((resolve, reject) => {
             const parsedHTML = parse5.parse(content);
-            Log.trace(parsedHTML);
-            resolve(null);
+            const table = this.findTable(parsedHTML);
+            const dataset = this.processTable(table);
+            resolve(dataset);
         });
+    }
+
+    // TODO: This function isn't quite right I'm missing something. Welp.
+    private findTable(parsedHTML: any): any {
+        let current = parsedHTML;
+        if (parsedHTML["nodeName"] === "tbody") {
+            Log.trace(current["nodeName"]);
+            return current;
+        } else {
+            Log.trace(parsedHTML);
+            let next = parsedHTML["childNodes"];
+            for (let node of next) {
+                this.findTable(node);
+            }
+        }
+    }
+
+    private processTable(table: any): any {
+        // TODO
     }
 
     private isValidSection(section: any): boolean {
