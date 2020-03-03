@@ -5,7 +5,7 @@ import Log from "../Util";
 import {stringify} from "querystring";
 import Room from "./Room";
 import * as fs from "fs";
-
+import Building from "./Building";
 
 export default class ZipProcessor {
     public id: string;
@@ -60,13 +60,13 @@ export default class ZipProcessor {
         });
     }
 
-    public processRoomsZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
+    public processRoomsZipContent(): Promise<Dataset> {
         const parse5 = require("parse5");
         return new Promise((resolve, reject) => {
             let zipFile: JSZip = new JSZip();
-            let dataset = new Dataset(id, kind);
+            let dataset = new Dataset(this.id, this.kind);
             let parsedHTML: any;
-            zipFile.loadAsync(content, {base64: true}).then((files) => {
+            zipFile.loadAsync(this.content, {base64: true}).then((files) => {
                 files.folder("rooms").file("index.htm").async("text").then((html: string) => {
                     parsedHTML = parse5.parse(html);
                 }).then(() => {
@@ -100,21 +100,24 @@ export default class ZipProcessor {
     }
 
     private obtainBuildingData(table: any): any {
-        const rooms = table["childNodes"];
-        for (let room of rooms) {
-            if (room["nodeName"] !== "#text") {
-                const data = room["childNodes"];
-                let buildingCode = data[3]["childNodes"][0]["value"];
+        const buildingsInfo = table["childNodes"];
+        let rooms: Room[] = [];
+        let buildingsList: Building[] = [];
+        for (let buildingInfo of buildingsInfo) {
+            if (buildingInfo["nodeName"] !== "#text") {
+                const data = buildingInfo["childNodes"];
+                let buildingCode = data[3]["childNodes"][0]["value"].substring(2).trim();
                 let buildingName = data[5]["childNodes"][1]["childNodes"][0]["value"];
-                let address = data[7]["childNodes"][0]["value"];
+                let address = data[7]["childNodes"][0]["value"].substring(2).trim();
                 let link = data[9]["childNodes"][1]["attrs"][0]["value"];
-                let newRoom = this.obtainRoomInfo(buildingCode, buildingName, address, link);
+                let building = new Building(this.content, buildingCode, buildingName, address, link);
+                buildingsList.push(building);
             }
         }
-    }
-
-    private obtainRoomInfo(buildingCode: string, buildingName: string, address: string, link: string): Room {
-        return null;
+        for (let building of buildingsList) {
+            let newRooms = building.getRooms();
+            rooms.concat(newRooms);
+        }
     }
 
     private isValidSection(section: any): boolean {

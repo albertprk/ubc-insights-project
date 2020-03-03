@@ -120,7 +120,7 @@ export default class InsightFacade implements IInsightFacade {
     private returnRooms(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         let zipProcessor = new ZipProcessor(id, content, kind);
         return new Promise((resolve, reject) => {
-            zipProcessor.processRoomsZipContent(id, content, kind)
+            zipProcessor.processRoomsZipContent()
                 .then((result: any) => {
                     resolve(result);
                 }).catch((err) => {
