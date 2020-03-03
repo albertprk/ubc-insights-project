@@ -61,30 +61,44 @@ export default class ZipProcessor {
     public processRoomsZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
         const parse5 = require("parse5");
         return new Promise((resolve, reject) => {
+            let dataset = new Dataset(id, kind);
             const parsedHTML = parse5.parse(content);
             const table = this.findTable(parsedHTML);
-            const dataset = this.processTable(table);
+            this.processTable(table);
             resolve(dataset);
         });
     }
 
     // TODO: This function isn't quite right I'm missing something. Welp.
     private findTable(parsedHTML: any): any {
-        let current = parsedHTML;
         if (parsedHTML["nodeName"] === "tbody") {
-            Log.trace(current["nodeName"]);
-            return current;
-        } else {
-            Log.trace(parsedHTML);
+            Log.trace(parsedHTML["nodeName"]);
+            return parsedHTML;
+        } else if (parsedHTML["childNodes"].length !== 0) {
+            Log.trace(parsedHTML["childNodes"]);
             let next = parsedHTML["childNodes"];
-            for (let node of next) {
-                this.findTable(node);
+            let count = 0;
+            while (count < next.length) {
+                if (this.findTable(next[count]) !== null) {
+                    return this.findTable(next[count]);
+                }
+                count++;
             }
+        } else {
+            return null;
         }
     }
 
     private processTable(table: any): any {
-        // TODO
+        const rooms = table["childNodes"];
+        for (let room of rooms) {
+            if (room["nodeName"] !== "#text") {
+                const data = room["childNodes"];
+                let buildingCode = data[3]["childNodes"][0]["value"];
+                let buildingName = data[5]["childNodes"][1]["childNodes"][0]["value"];
+                let address = data[7]["childNodes"][0]["value"];
+            }
+        }
     }
 
     private isValidSection(section: any): boolean {
