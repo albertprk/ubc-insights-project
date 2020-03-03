@@ -3,6 +3,8 @@ import * as JSZip from "jszip";
 import Dataset from "./Dataset";
 import Log from "../Util";
 import {stringify} from "querystring";
+import Room from "./Room";
+import * as fs from "fs";
 
 
 export default class ZipProcessor {
@@ -61,21 +63,23 @@ export default class ZipProcessor {
     public processRoomsZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
         const parse5 = require("parse5");
         return new Promise((resolve, reject) => {
+            let zipFile: JSZip = new JSZip();
             let dataset = new Dataset(id, kind);
-            const parsedHTML = parse5.parse(content);
-            const table = this.findTable(parsedHTML);
-            this.processTable(table);
-            resolve(dataset);
+            zipFile.loadAsync(content, {base64: true}).then((files) => {
+                files.folder("rooms").file("index.htm").async("text").then((html: string) => {
+                    const parsedHTML = parse5.parse(html);
+                    let htmlTable = this.findTable(parsedHTML);
+                    this.processTable(htmlTable);
+                    resolve(dataset);
+                });
+            });
         });
     }
 
-    // TODO: This function isn't quite right I'm missing something. Welp.
     private findTable(parsedHTML: any): any {
         if (parsedHTML["nodeName"] === "tbody") {
-            Log.trace(parsedHTML["nodeName"]);
             return parsedHTML;
         } else if (parsedHTML["childNodes"].length !== 0) {
-            Log.trace(parsedHTML["childNodes"]);
             let next = parsedHTML["childNodes"];
             let count = 0;
             while (count < next.length) {
@@ -97,8 +101,14 @@ export default class ZipProcessor {
                 let buildingCode = data[3]["childNodes"][0]["value"];
                 let buildingName = data[5]["childNodes"][1]["childNodes"][0]["value"];
                 let address = data[7]["childNodes"][0]["value"];
+                let link = data[9]["childNodes"][1]["attrs"][0]["value"];
+                let newRoom = this.processRoom(buildingCode, buildingName, address, link);
             }
         }
+    }
+
+    private processRoom(buildingCode: string, buildingName: string, address: string, link: string): Room {
+        return null;
     }
 
     private isValidSection(section: any): boolean {
