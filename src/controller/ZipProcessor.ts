@@ -65,13 +65,17 @@ export default class ZipProcessor {
         return new Promise((resolve, reject) => {
             let zipFile: JSZip = new JSZip();
             let dataset = new Dataset(id, kind);
+            let parsedHTML: any;
             zipFile.loadAsync(content, {base64: true}).then((files) => {
                 files.folder("rooms").file("index.htm").async("text").then((html: string) => {
-                    const parsedHTML = parse5.parse(html);
+                    parsedHTML = parse5.parse(html);
+                }).then(() => {
                     let htmlTable = this.findTable(parsedHTML);
-                    this.processTable(htmlTable);
+                    this.obtainBuildingData(htmlTable);
                     resolve(dataset);
                 });
+            }).catch((err) => {
+                reject(err);
             });
         });
     }
@@ -79,21 +83,23 @@ export default class ZipProcessor {
     private findTable(parsedHTML: any): any {
         if (parsedHTML["nodeName"] === "tbody") {
             return parsedHTML;
-        } else if (parsedHTML["childNodes"].length !== 0) {
-            let next = parsedHTML["childNodes"];
+        } else {
+            if (!parsedHTML.hasOwnProperty("childNodes") || parsedHTML["childNodes"].length === 0 ||
+                        typeof parsedHTML["childNodes"] === undefined) {
+                return null;
+            }
             let count = 0;
-            while (count < next.length) {
-                if (this.findTable(next[count]) !== null) {
-                    return this.findTable(next[count]);
+            while (count < parsedHTML["childNodes"].length) {
+                let result = this.findTable(parsedHTML["childNodes"][count]);
+                if ((result !== null) && (result !== undefined)) {
+                    return result;
                 }
                 count++;
             }
-        } else {
-            return null;
         }
     }
 
-    private processTable(table: any): any {
+    private obtainBuildingData(table: any): any {
         const rooms = table["childNodes"];
         for (let room of rooms) {
             if (room["nodeName"] !== "#text") {
@@ -102,12 +108,12 @@ export default class ZipProcessor {
                 let buildingName = data[5]["childNodes"][1]["childNodes"][0]["value"];
                 let address = data[7]["childNodes"][0]["value"];
                 let link = data[9]["childNodes"][1]["attrs"][0]["value"];
-                let newRoom = this.processRoom(buildingCode, buildingName, address, link);
+                let newRoom = this.obtainRoomInfo(buildingCode, buildingName, address, link);
             }
         }
     }
 
-    private processRoom(buildingCode: string, buildingName: string, address: string, link: string): Room {
+    private obtainRoomInfo(buildingCode: string, buildingName: string, address: string, link: string): Room {
         return null;
     }
 
