@@ -19,18 +19,28 @@ export default class Building {
         this.link = link;
     }
 
-    public getRooms(): any {
+    public getRooms(): Promise<Room[]> {
         const parse5 = require("parse5");
-        let zipFile: JSZip = new JSZip();
-        let parsedHTML: any;
-        zipFile.loadAsync(this.content, {base64: true}).then((files) => {
-            files.folder("rooms").file(this.link).async("text").then((html: string) => {
-                parsedHTML = parse5.parse(html);
-            }).then(() => {
-                Log.trace(parsedHTML);
+        return new Promise((resolve, reject) => {
+            let zipFile: JSZip = new JSZip();
+            let rooms: Room[] = [];
+            let parsedHTML: any;
+            Log.trace(this.link);
+            let buildingLink = this.link;
+            buildingLink = buildingLink.replace(".", "/rooms");
+            Log.trace(buildingLink);
+            zipFile.loadAsync(this.content, {base64: true}).then((files) => {
+                files.file(this.link).async("text").then((html: string) => {
+                    Log.trace("Test1");
+                    parsedHTML = parse5.parse(html);
+                }).then(() => {
+                    Log.trace("Test2");
+                    Log.trace(parsedHTML);
+                    resolve(rooms);
+                });
+            }).catch((err) => {
+                reject(err);
             });
-        }).catch((err) => {
-            throw err;
         });
     }
 }

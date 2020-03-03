@@ -99,7 +99,7 @@ export default class ZipProcessor {
         }
     }
 
-    private obtainBuildingData(table: any): any {
+    private obtainBuildingData(table: any): Room[] {
         const buildingsInfo = table["childNodes"];
         let rooms: Room[] = [];
         let buildingsList: Building[] = [];
@@ -116,8 +116,8 @@ export default class ZipProcessor {
         }
         for (let building of buildingsList) {
             let newRooms = building.getRooms();
-            rooms.concat(newRooms);
         }
+        return rooms;
     }
 
     private isValidSection(section: any): boolean {
