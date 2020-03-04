@@ -27,15 +27,12 @@ export default class Building {
             let parsedHTML: any;
             Log.trace(this.link);
             let buildingLink = this.link;
-            buildingLink = buildingLink.replace(".", "/rooms");
+            buildingLink = buildingLink.replace(".", "rooms");
             Log.trace(buildingLink);
             zipFile.loadAsync(this.content, {base64: true}).then((files) => {
-                files.file(this.link).async("text").then((html: string) => {
-                    Log.trace("Test1");
+                files.file(buildingLink).async("text").then((html: string) => {
                     parsedHTML = parse5.parse(html);
                 }).then(() => {
-                    Log.trace("Test2");
-                    Log.trace(parsedHTML);
                     resolve(rooms);
                 });
             }).catch((err) => {
