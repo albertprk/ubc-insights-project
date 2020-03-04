@@ -1,21 +1,31 @@
 import {InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 
 export default class Room {
-    public buildingCode: string;
-    public buildingName: string;
-    public roomNumber: string;
-    public address: string;
-    public furniture: string;
-    public capacity: number;
-    public photo: string;
+    public roomsFullName: string;
+    public roomsShortName: string;
+    public roomsNumber: number;
+    public roomsName: string;
+    public roomsAddress: string;
+    public roomsLat: number;
+    public roomsLon: number;
+    public roomsSeats: number;
+    public roomsType: string;
+    public roomsFurniture: string;
+    public roomsHref: string;
 
-    public constructor(buildingCode: string, buildingName: string, address: string, roomNumber: string,
-                       furniture: string, capacity: number, photo: string) {
-        this.buildingCode = buildingCode;
-        this.buildingName = buildingName;
-        this.roomNumber = roomNumber;
-        this.furniture = furniture;
-        this.capacity = capacity;
-        this.photo = photo;
+    public constructor(roomsFullName: string, roomsShortName: string, roomsNumber: number, roomsName: string,
+                       roomsAddress: string, roomsLat: number, roomsLon: number, roomsSeats: number, roomsType: string,
+                       roomsFurniture: string, roomsHref: string) {
+        this.roomsFullName = roomsFullName;
+        this.roomsShortName = roomsShortName;
+        this.roomsNumber = roomsNumber;
+        this.roomsName = roomsName;
+        this.roomsAddress = roomsAddress;
+        this.roomsLat = roomsLat;
+        this.roomsLon = roomsLon;
+        this.roomsSeats = roomsSeats;
+        this.roomsType = roomsType;
+        this.roomsFurniture = roomsFurniture;
+        this.roomsHref = roomsHref;
     }
 }
