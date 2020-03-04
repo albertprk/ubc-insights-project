@@ -25,19 +25,37 @@ export default class Building {
             let zipFile: JSZip = new JSZip();
             let rooms: Room[] = [];
             let parsedHTML: any;
-            Log.trace(this.link);
             let buildingLink = this.link;
             buildingLink = buildingLink.replace(".", "rooms");
-            Log.trace(buildingLink);
             zipFile.loadAsync(this.content, {base64: true}).then((files) => {
                 files.file(buildingLink).async("text").then((html: string) => {
                     parsedHTML = parse5.parse(html);
                 }).then(() => {
+                    let table = this.findTable(parsedHTML);
                     resolve(rooms);
                 });
             }).catch((err) => {
                 reject(err);
             });
         });
+    }
+
+    private findTable(parsedHTML: any): any {
+        if (parsedHTML["nodeName"] === "tbody") {
+            return parsedHTML;
+        } else {
+            if (!parsedHTML.hasOwnProperty("childNodes") || parsedHTML["childNodes"].length === 0 ||
+                typeof parsedHTML["childNodes"] === undefined) {
+                return null;
+            }
+            let count = 0;
+            while (count < parsedHTML["childNodes"].length) {
+                let result = this.findTable(parsedHTML["childNodes"][count]);
+                if ((result !== null) && (result !== undefined)) {
+                    return result;
+                }
+                count++;
+            }
+        }
     }
 }
