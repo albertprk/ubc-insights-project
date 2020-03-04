@@ -56,7 +56,9 @@ export default class ZipProcessor {
                         reject(new InsightError("No valid course sections"));
                     }
                     resolve(dataset);
-                });
+                }).catch((err) => {
+                    reject(err);
+            });
         });
     }
 

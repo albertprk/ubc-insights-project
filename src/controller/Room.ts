@@ -14,18 +14,21 @@ export default class Room {
     public roomsHref: string;
 
     public constructor(roomsFullName: string, roomsShortName: string, roomsNumber: number, roomsName: string,
-                       roomsAddress: string, roomsLat: number, roomsLon: number, roomsSeats: number, roomsType: string,
+                       roomsAddress: string, roomsSeats: number, roomsType: string,
                        roomsFurniture: string, roomsHref: string) {
         this.roomsFullName = roomsFullName;
         this.roomsShortName = roomsShortName;
         this.roomsNumber = roomsNumber;
         this.roomsName = roomsName;
         this.roomsAddress = roomsAddress;
-        this.roomsLat = roomsLat;
-        this.roomsLon = roomsLon;
         this.roomsSeats = roomsSeats;
         this.roomsType = roomsType;
         this.roomsFurniture = roomsFurniture;
         this.roomsHref = roomsHref;
+    }
+
+    public addLonLat(lat: number, lon: number) {
+        this.roomsLat = lat;
+        this.roomsLon = lon;
     }
 }

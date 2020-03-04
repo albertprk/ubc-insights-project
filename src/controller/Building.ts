@@ -61,37 +61,47 @@ export default class Building {
         }
     }
 
-    private processRooms(table: any): Room[] {
-        let roomsReturn: Room[] = [];
-        let roomsList = table["childNodes"];
-        for (let room of roomsList) {
-            if (room["nodeName"] !== "#text") {
-                let roomNum: number = room["childNodes"][1]["childNodes"][1]["childNodes"][0]["value"];
-                let roomCap: number = room["childNodes"][3]["childNodes"][0]["value"].substring(2).trim();
-                let furniture: string = room["childNodes"][5]["childNodes"][0]["value"].substring(2).trim();
-                let roomType: string = room["childNodes"][7]["childNodes"][0]["value"].substring(2).trim();
-                let roomsName: string = this.buildingCode + "_" + roomNum;
-                let lon: number;
-                let lat: number;
-                let queryAddress: string = this.address;
-                while (queryAddress.includes(" ")) {
-                    queryAddress = queryAddress.replace(" ", "%");
+    private processRooms(table: any): Promise<Room[]> {
+        try {
+            let roomsReturn: Room[] = [];
+            let roomsList: any;
+            roomsList = table["childNodes"];
+            for (let room of roomsList) {
+                try {
+                    if (room["nodeName"] !== "#text") {
+                        let newRoom: Room;
+                        let roomNum: number = room["childNodes"][1]["childNodes"][1]["childNodes"][0]["value"];
+                        let roomCap: number = room["childNodes"][3]["childNodes"][0]["value"].substring(2).trim();
+                        let furniture: string = room["childNodes"][5]["childNodes"][0]["value"].substring(2).trim();
+                        let roomType: string = room["childNodes"][7]["childNodes"][0]["value"].substring(2).trim();
+                        let roomsName: string = this.buildingCode + "_" + roomNum;
+                        let lon: number;
+                        let lat: number;
+                        let queryAddress: string = this.address;
+                        newRoom = new Room(this.buildingCode, this.buildingCode, roomNum, roomsName, this.address,
+                            roomCap, roomType, furniture, this.link);
+                        Log.trace(newRoom);
+                        while (queryAddress.includes(" ")) {
+                            queryAddress = queryAddress.replace(" ", "%");
+                        }
+                        try {
+                            http.get("http://cs310.students.cs.ubc.ca:11316/api/v1/project_team136/" + queryAddress,
+                                (response) => {
+                                    // IMPLEMENT
+                                });
+                        } catch (err) {
+                            Log.trace("PROBLEMMZZZ");
+                        }
+                        roomsList.push(newRoom);
+                    }
+                } catch {
+                    Log.trace("Skipping over file");
                 }
-                let geoResponse: Promise<any> = new Promise((resolve, reject) => {
-                    http.get(
-                        "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team136/" + queryAddress,
-                        (georesponse: any) => {
-                            lon = georesponse.lon;
-                            lat = georesponse.lat;
-                            let newRoom: Room = new Room(this.buildingName, this.buildingCode, roomNum, roomsName,
-                                this.address, lat, lon, roomCap, roomType, furniture, this.link);
-                            roomsReturn.push(newRoom);
-                        });
-                }).catch((err) => {
-                    throw err;
-                });
             }
+            Log.trace(roomsReturn);
+            return Promise.resolve(roomsReturn);
+        } catch (err) {
+            Log.trace("Skipping over file");
         }
-        return roomsReturn;
     }
 }
