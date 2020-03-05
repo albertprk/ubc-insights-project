@@ -73,7 +73,7 @@ export default class ZipProcessor {
                     parsedHTML = parse5.parse(html);
                 }).then(() => {
                     let htmlTable = this.findTable(parsedHTML);
-                    this.obtainBuildingData(htmlTable);
+                    dataset.addSection(this.obtainBuildingData(htmlTable));
                     resolve(dataset);
                 });
             }).catch((err) => {
@@ -117,8 +117,10 @@ export default class ZipProcessor {
             }
         }
         for (let building of buildingsList) {
-            let newRooms = building.getRooms();
+            rooms.push(building.getRooms());
+            Log.trace(rooms);
         }
+        Log.trace("FINAL: " + rooms);
         return rooms;
     }
 

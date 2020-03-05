@@ -38,11 +38,13 @@ export default class InsightFacade implements IInsightFacade {
         }
 
         this.datasets = new Map();
+        /*
         this.loadDatasetsFromMemory().then((result) => {
           Log.trace("InsightFacadeImpl::init()");
         }).catch((err) => {
           Log.error(err);
         });
+        */
     }
 
     private loadDatasetsFromMemory(): Promise<string[][]> {
@@ -159,7 +161,8 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((resolve, reject) => {
             zipProcessor.processRoomsZipContent()
                 .then((result: any) => {
-                    resolve(result);
+                    this.datasets.set(id, result);
+                    resolve(Array.from(this.datasets.keys()));
                 }).catch((err) => {
                     reject(
                         new InsightError(

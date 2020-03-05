@@ -20,11 +20,10 @@ export default class Building {
         this.link = link;
     }
 
-    public getRooms(): Promise<Room[]> {
+    public getRooms(): any {
         const parse5 = require("parse5");
         return new Promise((resolve, reject) => {
             let zipFile: JSZip = new JSZip();
-            let rooms: Room[] = [];
             let parsedHTML: any;
             let buildingLink = this.link;
             buildingLink = buildingLink.replace(".", "rooms");
@@ -33,12 +32,13 @@ export default class Building {
                     parsedHTML = parse5.parse(html);
                 }).then(() => {
                     let table = this.findTable(parsedHTML);
-                    this.processRooms(table);
-                    resolve(rooms);
+                    resolve(this.processRooms(table));
                 });
             }).catch((err) => {
                 reject(err);
             });
+        }).catch((err) => {
+            throw err;
         });
     }
 
@@ -90,13 +90,12 @@ export default class Building {
                         roomsReturn.push(newRoom);
                     }
                 } catch {
-                    Log.trace("Skipping over file");
+                    //
                 }
             }
-            Log.trace(roomsReturn);
             return Promise.resolve(roomsReturn);
         } catch (err) {
-            Log.trace("Skipping over file");
+            //
         }
     }
 }
