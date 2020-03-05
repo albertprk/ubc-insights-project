@@ -8,14 +8,14 @@ export default class ParsingTree {
         Log.trace("ParsingTree::init()");
     }
 
-    // TODO: update map, Albert has already reformatted names. This isn't needed
-    // Also to do: section is a type, need to redo how to access
     public MFIELD_MAP: Record<string, string> = {
         avg: "Avg",
         pass: "Pass",
         fail: "Fail",
         audit: "Audit",
         year: "Year",
+        lat: "lat",
+        lon: "lon"
     };
 
     public SFIELD_MAP: Record<string, string> = {
@@ -24,6 +24,14 @@ export default class ParsingTree {
         instructor: "Professor",
         title: "Title",
         uuid: "id",
+        fullname: "fullname",
+        shortname: "shortname",
+        number: "number",
+        name: "name",
+        address: "address",
+        type: "type",
+        furniture: "furniture",
+        href: "href"
     };
 
     public createTreeNode(query: any): TreeNode {
@@ -31,6 +39,8 @@ export default class ParsingTree {
 
         if (typeof query === "string" || typeof query === "number") {
             return new TreeNode(query);
+        } else if (!Array.isArray(query) && typeof query === "object" && Object.keys(query).length === 0) {
+            return null;
         }
 
         const key: string = Object.keys(query)[0];
@@ -181,73 +191,19 @@ export default class ParsingTree {
         }
     }
 
-    public reformatSection(section: any, columns: string[]): Record<string, any> {
-        let reformattedSection: Record<string, any> = {};
-
-        try {
-            for (let col of columns) {
-                const key: string = col.split("_")[1];
-
-                if (
-                    typeof section[this.MFIELD_MAP[key]] !== "undefined" &&
-                    key === "year"
-                ) {
-                    reformattedSection[col] =
-                        key === "year" && section["Section"] === "overall"
-                            ? 1900
-                            : parseInt(section[this.MFIELD_MAP[key]], 10);
-                } else if (typeof section[this.MFIELD_MAP[key]] !== "undefined") {
-                    reformattedSection[col] = section[this.MFIELD_MAP[key]];
-                } else if (typeof section[this.SFIELD_MAP[key]] !== "undefined") {
-                    reformattedSection[col] =
-                        key === "uuid"
-                            ? section[this.SFIELD_MAP[key]].toString()
-                            : section[this.SFIELD_MAP[key]];
-                } else {
-                    return null;
-                }
-            }
-            return reformattedSection;
-        } catch {
-            return null;
-        }
-    }
-
-    public sortSections(sections: any[], query: any): any[] {
-        let orderKey: string;
-        if (typeof query["OPTIONS"]["ORDER"] !== "undefined") {
-            orderKey = query["OPTIONS"]["ORDER"];
-        } else {
-            return sections;
-        }
-
-        sections.sort((a: any, b: any) => {
-            if (typeof a[orderKey] === "string" && a[orderKey].toLowerCase() < b[orderKey].toLowerCase()) {
-                return -1;
-            } else if (typeof a[orderKey] === "string" && a[orderKey].toLowerCase() > b[orderKey].toLowerCase()) {
-                return 1;
-            } else if (typeof a[orderKey] === "string") {
-                return 0;
-            } else if (typeof a[orderKey] === "number") {
-              let result: number = a[orderKey] - b[orderKey];
-              return isNaN(a[orderKey]) ? 1 : (isNaN(result)) ? -1 : result;
-            } else {
-                return 1;
-            }
-        });
-
-        return sections;
-    }
-
     public searchSections(
         dataset: Dataset,
-        tree: TreeNode,
-        columns: string[],
+        tree: TreeNode
     ): any[] {
         let result: any[] = [];
+
+        if (tree === null) {
+            return dataset.sections;
+        }
+
         for (let section of dataset.sections) {
             if (this.meetsTreeCriteria(section, tree)) {
-                result.push(this.reformatSection(section, columns));
+                result.push(section);
                 if (result.length > 5000) {
                     throw new ResultTooLargeError();
                 }
@@ -256,4 +212,5 @@ export default class ParsingTree {
 
         return result;
     }
+
 }

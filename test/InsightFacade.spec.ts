@@ -664,6 +664,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
 });
 
+
 /*
  * This test suite dynamically generates tests from the JSON files in test/queries.
  * You should not need to modify it; instead, add additional files to the queries directory.
@@ -676,6 +677,10 @@ describe("InsightFacade PerformQuery", () => {
         courses: {
             path: "./test/data/courses.zip",
             kind: InsightDatasetKind.Courses,
+        },
+        rooms: {
+            path: "./test/data/rooms.zip",
+            kind: InsightDatasetKind.Rooms,
         },
     };
     let insightFacade: InsightFacade;
@@ -738,7 +743,8 @@ describe("InsightFacade PerformQuery", () => {
             for (const test of testQueries) {
                 it(`[${test.filename}] ${test.title}`, function (done) {
                     const resultChecker = TestUtil.getQueryChecker(test, done);
-                    insightFacade.performQuery(test.query)
+                    insightFacade
+                        .performQuery(test.query)
                         .then(resultChecker)
                         .catch(resultChecker);
                 });
