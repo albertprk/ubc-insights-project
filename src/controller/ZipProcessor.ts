@@ -18,7 +18,7 @@ export default class ZipProcessor {
         this.kind = kind;
     }
 
-    public processZipContent(): Promise<Dataset> {
+    public processZipContent(fromDisk: boolean): Promise<Dataset> {
         return new Promise((resolve, reject) => {
             let zipFile: JSZip = new JSZip();
             zipFile.loadAsync(this.content, {base64: true}).then((files) => {

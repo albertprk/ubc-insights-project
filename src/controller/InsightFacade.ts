@@ -15,6 +15,7 @@ import ReformattedDataset from "./ReformattedDataset";
 import TreeNode from "./TreeNode";
 import Dataset from "./Dataset";
 import ZipProcessor from "./ZipProcessor";
+import * as JSZip from "jszip";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -45,6 +46,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     private loadDatasetsFromMemory(): Promise<string[][]> {
+        /*
         const allFiles = fs.readdirSync(this.dataFolder);
         let promises: Array<Promise<string[]>> = [];
         allFiles.forEach((file) => {
@@ -53,10 +55,11 @@ export default class InsightFacade implements IInsightFacade {
             );
 
             this.findKind(content).then((kind) => {
-              const index: number = file.indexOf(".zip");
-              promises.push(
-                  this.processZipContent(
-                      file.substring(0, index), content.toString("base64"), kind)
+                const index: number = file.indexOf(".zip");
+                let zipProcessor: ZipProcessor = new ZipProcessor(file.substring(0, index),
+                    content.toString("base64"), kind);
+                promises.push(
+                    zipProcessor.processZipContent(true)
               );
             });
         });
@@ -64,6 +67,8 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((resolve, reject) => {
             resolve(Promise.all(promises));
         });
+        */
+        return null;
     }
 
     private findKind(content: Buffer): Promise<InsightDatasetKind> {
@@ -91,9 +96,6 @@ export default class InsightFacade implements IInsightFacade {
       });
     }
 
-    // If it's an invalid dataset then JSZip will throw an error
-    // Todo: Check to see if there's at least one valid course section
-    // Todo: Skip over invalid file
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         if (id === null || typeof id === "undefined" || content === null ||
             typeof content === "undefined" || kind === null || typeof kind === "undefined") {
@@ -140,7 +142,7 @@ export default class InsightFacade implements IInsightFacade {
     private returnCourses(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         let zipProcessor = new ZipProcessor(id, content, kind);
         return new Promise((resolve, reject) => {
-            zipProcessor.processZipContent()
+            zipProcessor.processZipContent(false)
                 .then((data: Dataset) => {
                     this.datasets.set(id, data);
                     resolve(Array.from(this.datasets.keys()));

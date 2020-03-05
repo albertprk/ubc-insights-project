@@ -64,7 +64,7 @@ export default class Building {
     private processRooms(table: any): Promise<Room[]> {
         try {
             let roomsReturn: Room[] = [];
-            let roomsList: any;
+            let roomsList: any = [];
             roomsList = table["childNodes"];
             for (let room of roomsList) {
                 try {
@@ -78,21 +78,16 @@ export default class Building {
                         let lon: number;
                         let lat: number;
                         let queryAddress: string = this.address;
-                        newRoom = new Room(this.buildingCode, this.buildingCode, roomNum, roomsName, this.address,
+                        newRoom = new Room(this.buildingName, this.buildingCode, roomNum, roomsName, this.address,
                             roomCap, roomType, furniture, this.link);
-                        Log.trace(newRoom);
                         while (queryAddress.includes(" ")) {
                             queryAddress = queryAddress.replace(" ", "%");
                         }
-                        try {
-                            http.get("http://cs310.students.cs.ubc.ca:11316/api/v1/project_team136/" + queryAddress,
-                                (response) => {
-                                    // IMPLEMENT
-                                });
-                        } catch (err) {
-                            Log.trace("PROBLEMMZZZ");
-                        }
-                        roomsList.push(newRoom);
+                        http.get("http://cs310.students.cs.ubc.ca:11316/api/v1/project_team136/" +
+                                "1822%East%Mall%V6T&1Z1", (res: any) => {
+                                    Log.trace("!!!!!!");
+                        });
+                        roomsReturn.push(newRoom);
                     }
                 } catch {
                     Log.trace("Skipping over file");
