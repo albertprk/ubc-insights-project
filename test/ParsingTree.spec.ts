@@ -1,10 +1,12 @@
 import { expect } from "chai";
 import TreeNode from "../src/controller/TreeNode";
+import ReformattedDataset from "../src/controller/ReformattedDataset";
 import ParsingTree from "../src/controller/ParsingTree";
 import Log from "../src/Util";
 
 describe("ParsingTree: matchesTreeCriteria", function () {
     let parsingTree: ParsingTree;
+    let reformattedDataset: ReformattedDataset;
     let isNode: TreeNode;
     let courseNode: TreeNode;
     let yearNode: TreeNode;
@@ -14,6 +16,7 @@ describe("ParsingTree: matchesTreeCriteria", function () {
 
     beforeEach(function () {
         parsingTree = new ParsingTree();
+        reformattedDataset = new ReformattedDataset();
         isNode = new TreeNode("IS");
         andNode = new TreeNode("AND");
         orNode = new TreeNode("OR");
@@ -220,11 +223,13 @@ describe("ParsingTree: createParsingTree", () => {
 
 describe("ParsingTree: reformattingSection", () => {
     let parsingTree: ParsingTree;
+    let reformattedDataset: ReformattedDataset;
     let columns: string[];
 
     beforeEach(() => {
         parsingTree = new ParsingTree();
         columns = ["courses_dept", "courses_id", "courses_year"];
+        reformattedDataset = new ReformattedDataset();
     });
 
     it("Should return null, because fields are missing", () => {
@@ -236,7 +241,7 @@ describe("ParsingTree: reformattingSection", () => {
             Subject: "bota",
         };
 
-        expect(parsingTree.reformatSection(section, columns)).to.equal(null);
+        expect(reformattedDataset.reformatSection(section, columns)).to.equal(null);
     });
 
     it("Should return list because all values are present", () => {
@@ -256,7 +261,7 @@ describe("ParsingTree: reformattingSection", () => {
             courses_year: 2020,
         };
 
-        expect(parsingTree.reformatSection(section, columns)).to.deep.equal(
+        expect(reformattedDataset.reformatSection(section, columns)).to.deep.equal(
             expected,
         );
     });
@@ -278,7 +283,7 @@ describe("ParsingTree: reformattingSection", () => {
             courses_year: 1900,
         };
 
-        expect(parsingTree.reformatSection(section, columns)).to.deep.equal(
+        expect(reformattedDataset.reformatSection(section, columns)).to.deep.equal(
             expected,
         );
     });
@@ -286,11 +291,13 @@ describe("ParsingTree: reformattingSection", () => {
 
 describe("ParsingTree: reformattingSection", () => {
     let parsingTree: ParsingTree;
+    let reformattedDataset: ReformattedDataset;
     let query: any;
     let sections: any[];
 
     beforeEach(() => {
         parsingTree = new ParsingTree();
+        reformattedDataset = new ReformattedDataset();
         query = {
             WHERE: {
                 AND: [
@@ -323,37 +330,7 @@ describe("ParsingTree: reformattingSection", () => {
             { courses_dept: "bota", courses_id: "304", courses_year: 1900 },
             { courses_dept: "aadhe", courses_id: "304", courses_year: 2000 },
         ];
-        expect(parsingTree.sortSections(sections, query)).to.deep.equal(
-            expected,
-        );
-    });
-
-    it("Should sort according to column[0]", () => {
-        const noOrderQuery = {
-            WHERE: {
-                AND: [
-                    {
-                        GT: {
-                            courses_year: 1950,
-                        },
-                    },
-                    {
-                        IS: {
-                            courses_dept: "*a",
-                        },
-                    },
-                ],
-            },
-            OPTIONS: {
-                COLUMNS: ["courses_dept", "courses_id", "courses_year"],
-            },
-        };
-
-        const expected = [
-            { courses_dept: "aadhe", courses_id: "304", courses_year: 2000 },
-            { courses_dept: "bota", courses_id: "304", courses_year: 1900 },
-        ];
-        expect(parsingTree.sortSections(sections, noOrderQuery)).to.deep.equal(
+        expect(reformattedDataset.sortSections(sections, query)).to.deep.equal(
             expected,
         );
     });
@@ -368,7 +345,7 @@ describe("ParsingTree: reformattingSection", () => {
             { courses_dept: "bota", courses_id: "304", courses_year: 1900 },
             { courses_dept: "aadhe", courses_id: "304", courses_year: 2000 },
         ];
-        expect(parsingTree.sortSections(sections, query)).to.deep.equal(
+        expect(reformattedDataset.sortSections(sections, query)).to.deep.equal(
             expected,
         );
     });
@@ -376,30 +353,45 @@ describe("ParsingTree: reformattingSection", () => {
 
 describe("ParsingTree: Sorting sections", () => {
     let results;
+    let reformattedDataset: ReformattedDataset;
     let sections: any[];
     let query: any;
     let parsingTree: ParsingTree;
 
     beforeEach(() => {
         parsingTree = new ParsingTree();
+        reformattedDataset = new ReformattedDataset();
         sections = [
-            {
-                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
-                courses_title: "plnt phys", courses_uuid: "4205",
+            {courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 1900,
+                courses_id: "351",
+                courses_instructor: "",
+                courses_title: "plnt phys",
+                courses_uuid: "4205",
             },
             {
-                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 2014, courses_id: "352",
-                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_dept: "apbc",
+                courses_avg: 52.08,
+                courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 2014,
+                courses_id: "352",
+                courses_instructor: "mansfield, shawn",
+                courses_title: "plnt phys",
                 courses_uuid: "41155",
-            }
+            },
         ];
         query = {
             WHERE: {
-                AND: [{ LT: { courses_avg: 90 } },
-                { IS: { courses_dept: "aanb" } }]
-            }, OPTIONS: {
+                AND: [
+                    { LT: { courses_avg: 90 } },
+                    { IS: { courses_dept: "aanb" } },
+                ],
+            },
+            OPTIONS: {
                 COLUMNS: [
                     "courses_dept",
                     "courses_avg",
@@ -410,10 +402,10 @@ describe("ParsingTree: Sorting sections", () => {
                     "courses_id",
                     "courses_instructor",
                     "courses_title",
-                    "courses_uuid"
+                    "courses_uuid",
                 ],
-                ORDER: "courses_dept"
-            }
+                ORDER: "courses_dept",
+            },
         };
     });
 
@@ -421,112 +413,172 @@ describe("ParsingTree: Sorting sections", () => {
         query["OPTIONS"]["ORDER"] = "courses_dept";
         let result = [
             {
-                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 2014, courses_id: "352",
-                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_dept: "apbc", courses_avg: 52.08,
+                courses_fail: 5, courses_pass: 8,
+                courses_audit: 0, courses_year: 2014,
+                courses_id: "352", courses_instructor: "mansfield, shawn",
+                courses_title: "plnt phys",
                 courses_uuid: "41155",
             },
             {
-                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
-                courses_title: "plnt phys", courses_uuid: "4205",
-            }
+                courses_dept: "apbi",
+                courses_avg: 52.08,
+                courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 1900,
+                courses_id: "351",
+                courses_instructor: "",
+                courses_title: "plnt phys",
+                courses_uuid: "4205",
+            },
         ];
-        let sortedSection = parsingTree.sortSections(sections, query);
+        let sortedSection = reformattedDataset.sortSections(sections, query);
         expect(sortedSection).to.deep.equal(result);
     });
 
     it("Should sort with no order", () => {
         let insideQuery = {
             WHERE: {
-                AND: [{ LT: { courses_avg: 90 } },
-                { IS: { courses_dept: "aanb" } }]
-            }, OPTIONS: {
+                AND: [
+                    { LT: { courses_avg: 90 } },
+                    { IS: { courses_dept: "aanb" } },
+                ],
+            },
+            OPTIONS: {
                 COLUMNS: [
-                    "courses_dept",
-                    "courses_avg",
-                    "courses_fail",
-                    "courses_pass",
-                    "courses_audit",
-                    "courses_year",
-                    "courses_id",
-                    "courses_instructor",
+                    "courses_dept", "courses_avg",
+                    "courses_fail", "courses_pass",
+                    "courses_audit", "courses_year",
+                    "courses_id", "courses_instructor",
                     "courses_title",
-                    "courses_uuid"
-                ]
-            }
+                    "courses_uuid",
+                ],
+            },
         };
 
         let result = [
             {
-                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 2014, courses_id: "352",
-                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_dept: "apbc",
+                courses_avg: 52.08,
+                courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 2014,
+                courses_id: "352",
+                courses_instructor: "mansfield, shawn",
+                courses_title: "plnt phys",
                 courses_uuid: "41155",
             },
             {
-                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
-                courses_title: "plnt phys", courses_uuid: "4205",
-            }
+                courses_dept: "apbi",
+                courses_avg: 52.08,
+                courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 1900,
+                courses_id: "351",
+                courses_instructor: "",
+                courses_title: "plnt phys",
+                courses_uuid: "4205",
+            },
         ];
-        let sortedSection = parsingTree.sortSections(sections, query);
+        let sortedSection = reformattedDataset.sortSections(sections, query);
         expect(sortedSection).to.deep.equal(result);
     });
 
     it("Should sort by instructor", () => {
         query["OPTIONS"]["ORDER"] = "courses_instructor";
-        let sortedSection = parsingTree.sortSections(sections, query);
+        let sortedSection = reformattedDataset.sortSections(sections, query);
         let result = [
             {
-                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
-                courses_title: "plnt phys", courses_uuid: "4205"
+                courses_dept: "apbi",
+                courses_avg: 52.08,
+                courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 1900,
+                courses_id: "351",
+                courses_instructor: "",
+                courses_title: "plnt phys",
+                courses_uuid: "4205",
             },
             {
-                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 2014, courses_id: "352",
-                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_dept: "apbc",
+                courses_avg: 52.08,
+                courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 2014,
+                courses_id: "352",
+                courses_instructor: "mansfield, shawn",
+                courses_title: "plnt phys",
                 courses_uuid: "41155",
-            }
+            },
         ];
         expect(sortedSection).to.deep.equal(result);
     });
 
     it("Should sort by uuid", () => {
         query["OPTIONS"]["ORDER"] = "courses_uuid";
-        let sortedSection = parsingTree.sortSections(sections, query);
+        let sortedSection = reformattedDataset.sortSections(sections, query);
         let result = [
             {
-                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 2014, courses_id: "352",
-                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_dept: "apbc",
+                courses_avg: 52.08,
+                courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 2014,
+                courses_id: "352",
+                courses_instructor: "mansfield, shawn",
+                courses_title: "plnt phys",
                 courses_uuid: "41155",
             },
             {
-                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
-                courses_title: "plnt phys", courses_uuid: "4205",
-            }
+                courses_dept: "apbi",
+                courses_avg: 52.08,
+                courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 1900,
+                courses_id: "351",
+                courses_instructor: "",
+                courses_title: "plnt phys",
+                courses_uuid: "4205",
+            },
         ];
         expect(sortedSection).to.deep.equal(result);
     });
 
     it("Should sort by year", () => {
         query["OPTIONS"]["ORDER"] = "courses_year";
-        let sortedSection = parsingTree.sortSections(sections, query);
+        let sortedSection = reformattedDataset.sortSections(sections, query);
         let result = [
             {
-                courses_dept: "apbi", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 1900, courses_id: "351", courses_instructor: "",
-                courses_title: "plnt phys", courses_uuid: "4205",
+                courses_dept: "apbi",
+                courses_avg: 52.08,
+                courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 1900,
+                courses_id: "351",
+                courses_instructor: "",
+                courses_title: "plnt phys",
+                courses_uuid: "4205",
             },
             {
-                courses_dept: "apbc", courses_avg: 52.08, courses_fail: 5, courses_pass: 8,
-                courses_audit: 0, courses_year: 2014, courses_id: "352",
-                courses_instructor: "mansfield, shawn", courses_title: "plnt phys",
+                courses_dept: "apbc",
+                courses_avg: 52.08,
+                courses_fail: 5,
+                courses_pass: 8,
+                courses_audit: 0,
+                courses_year: 2014,
+                courses_id: "352",
+                courses_instructor: "mansfield, shawn",
+                courses_title: "plnt phys",
                 courses_uuid: "41155",
-            }
+            },
         ];
         expect(sortedSection).to.deep.equal(result);
     });
