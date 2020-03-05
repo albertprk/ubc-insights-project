@@ -39,6 +39,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         notInCourses: "./test/data/notInCourses.zip",
         emptySections: "./test/data/onlyEmptySections.zip",
         invalidSections: "./test/data/allInvalidSections.zip",
+        rooms: "./test/data/rooms.zip"
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -76,12 +77,24 @@ describe("InsightFacade Add/Remove Dataset", function () {
         Log.test(`AfterTest: ${this.currentTest.title}`);
     });
 
-    // This is a unit test. You should create more like this!
     it("Should add a valid dataset", function () {
         const id: string = "courses";
         const expected: string[] = [id];
         return insightFacade
             .addDataset(id, datasets[id], InsightDatasetKind.Courses)
+            .then((result: string[]) => {
+                expect(result).to.deep.equal(expected);
+            })
+            .catch((err: any) => {
+                expect.fail(err, expected, "Should not have rejected");
+            });
+    });
+
+    it("Should add a valid rooms dataset", function () {
+        const id: string = "rooms";
+        const expected: string[] = [id];
+        return insightFacade
+            .addDataset(id, datasets[id], InsightDatasetKind.Rooms)
             .then((result: string[]) => {
                 expect(result).to.deep.equal(expected);
             })
@@ -490,18 +503,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const id: string = "anyId";
         return insightFacade
             .addDataset(id, datasets["coursers"], null)
-            .then((result: string[]) => {
-                expect.fail(result, "Should not rejected");
-            })
-            .catch((err: any) => {
-                expect(err).to.be.an.instanceOf(InsightError);
-            });
-    });
-
-    it("addDataSet should fail due to Rooms kind in C0", function () {
-        const id: string = "anyId";
-        return insightFacade
-            .addDataset(id, datasets["coursers"], InsightDatasetKind.Rooms)
             .then((result: string[]) => {
                 expect.fail(result, "Should not rejected");
             })
