@@ -1,14 +1,20 @@
 import Log from "../Util";
 import * as fs from "fs";
 import * as path from "path";
-import * as JSZip from "jszip";
-import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
+import {
+    IInsightFacade,
+    InsightDataset,
+    InsightDatasetKind,
+    InsightError,
+    NotFoundError,
+    ResultTooLargeError
+} from "./IInsightFacade";
 import QueryValidator from "./QueryValidator";
 import ParsingTree from "./ParsingTree";
 import ReformattedDataset from "./ReformattedDataset";
 import TreeNode from "./TreeNode";
-import {InsightError, NotFoundError, ResultTooLargeError} from "./IInsightFacade";
 import Dataset from "./Dataset";
+import ZipProcessor from "./ZipProcessor";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -105,11 +111,6 @@ export default class InsightFacade implements IInsightFacade {
                 reject(new InsightError("Error: A dataset with the given ID has already been added."));
             });
         }
-        if (kind === InsightDatasetKind.Rooms) {
-            return new Promise((resolve, reject) => {
-                reject(new InsightError("Error: InsightDatasetKind of rooms is not currently supported"));
-            });
-        }
         let filePath: string = path.join(this.dataFolder, "/" + id + ".zip");
         if (fs.existsSync(filePath)) {
             return new Promise((resolve, reject) => {
@@ -125,85 +126,46 @@ export default class InsightFacade implements IInsightFacade {
                 }
             });
         }
+        if (kind === InsightDatasetKind.Courses) {
+            return this.returnCourses(id, content, kind);
+        } else if (kind === InsightDatasetKind.Rooms) {
+            return this.returnRooms(id, content, kind);
+        } else {
+            return new Promise((resolve, reject) => {
+                reject(new InsightError("Invalid InsightDatasetsKind parameter: must be Courses OR Rooms"));
+            });
+        }
+    }
 
+    private returnCourses(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+        let zipProcessor = new ZipProcessor(id, content, kind);
         return new Promise((resolve, reject) => {
-            this.processZipContent(id, content, kind)
-                .then((result) => {
-                    resolve(result);
-                })
-                .catch((err) => {
-                    reject(
-                        new InsightError(
-                            "Error: Problem processing the data zip. Ensure the content given" +
-                                "is a valid ZIP file.",
-                        ),
+            zipProcessor.processZipContent()
+                .then((data: Dataset) => {
+                    this.datasets.set(id, data);
+                    resolve(Array.from(this.datasets.keys()));
+                }).catch((err: any) => {
+                    reject(new InsightError("Error: Problem processing the data zip. Ensure the content given" +
+                            "is a valid ZIP file.")
                     );
                 });
         });
     }
 
-    // Todo: Check that JSON contains all the necessary keys
-    private processZipContent(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+    private returnRooms(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+        let zipProcessor = new ZipProcessor(id, content, kind);
         return new Promise((resolve, reject) => {
-            let zipFile: JSZip = new JSZip();
-            zipFile
-                .loadAsync(content, { base64: true })
-                .then((files) => {
-                    let promises: Array<Promise<string>> = [];
-                    files.folder("courses").forEach((file) => {
-                        promises.push(
-                            files.folder("courses").file(file).async("text")
-                        );
-                    });
-                    return Promise.all(promises);
-                })
-                .then((sectionPromises: string[]) => {
-                    if (sectionPromises.length === 0) {
-                        reject(new InsightError("No courses files in dataset."));
-                    }
-
-                    let dataset: Dataset = new Dataset(id, kind);
-                    sectionPromises.forEach((sectionPromise: string) => {
-                        try {
-                            let jsonFile = JSON.parse(sectionPromise);
-                            let results = jsonFile["result"];
-                            for (let section of results) {
-                                if (this.isValidSection(section)) {
-                                    dataset.addSection(section);
-                                }
-                            }
-                        } catch (err) {
-                            Log.info("Caught invalid JSON file");
-                        }
-                    });
-
-                    if (dataset.sections.length === 0) {
-                        reject(new InsightError("No valid course sections"));
-                    }
-                    return dataset;
-                })
-                .then((data: Dataset) => {
-                    this.datasets.set(id, data);
-                    resolve(Array.from(this.datasets.keys()));
-                })
-                .catch((err) => {
-                    Log.trace(err);
-                    reject(new InsightError("Invalid file type."));
+            zipProcessor.processRoomsZipContent()
+                .then((result: any) => {
+                    resolve(result);
+                }).catch((err) => {
+                    reject(
+                        new InsightError(
+                            "Error: Problem processing the data zip. Ensure the content given" +
+                            "is a valid ZIP file.")
+                    );
                 });
         });
-    }
-
-    private isValidSection(section: any): boolean {
-        const keys: string[] = ["Avg", "Audit", "Fail", "Pass", "Subject",
-            "Course", "Professor", "Title", "id"];
-
-        for (let key of keys) {
-            if (typeof section[key] === "undefined") {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public removeDataset(id: string): Promise<string> {
