@@ -1,5 +1,7 @@
 import {InsightDatasetKind, InsightError} from "./IInsightFacade";
 import * as JSZip from "jszip";
+import * as parse5 from "parse5";
+import * as http from "http";
 import Dataset from "./Dataset";
 import Log from "../Util";
 import {stringify} from "querystring";
@@ -18,18 +20,16 @@ export default class ZipProcessor {
         this.kind = kind;
     }
 
+    public indexTable: any = {};
+    private studentLink: string = "http://students.ubc.ca";
+
     public processZipContent(): Promise<Dataset> {
         return new Promise((resolve, reject) => {
             let zipFile: JSZip = new JSZip();
             zipFile.loadAsync(this.content, {base64: true}).then((files) => {
                     let promises: Array<Promise<string>> = [];
                     files.folder("courses").forEach((file) => {
-                        promises.push(
-                            files
-                                .folder("courses")
-                                .file(file)
-                                .async("text"),
-                        );
+                        promises.push(files.folder("courses").file(file).async("text"));
                     });
                     return Promise.all(promises);
                 }).then((sectionPromises: string[]) => {
@@ -63,7 +63,6 @@ export default class ZipProcessor {
     }
 
     public processRoomsZipContent(): Promise<Dataset> {
-        const parse5 = require("parse5");
         return new Promise((resolve, reject) => {
             let zipFile: JSZip = new JSZip();
             let dataset = new Dataset(this.id, this.kind);
@@ -71,15 +70,131 @@ export default class ZipProcessor {
             zipFile.loadAsync(this.content, {base64: true}).then((files) => {
                 files.folder("rooms").file("index.htm").async("text").then((html: string) => {
                     parsedHTML = parse5.parse(html);
+                    return parsedHTML;
                 }).then(() => {
                     let htmlTable = this.findTable(parsedHTML);
-                    this.obtainBuildingData(htmlTable);
-                    resolve(dataset);
+                    this.createIndexTable(htmlTable["childNodes"]);
+                    return this.getLatAndLong();
+                }).then((result) => {
+                    return this.getRooms();
+                }).then((datasetResult) => {
+                    resolve(datasetResult);
                 });
             }).catch((err) => {
                 reject(err);
             });
         });
+    }
+
+    private getLatAndLong(): Promise<string[]> {
+      let promises: Array<Promise<string>> = [];
+      Object.keys(this.indexTable).forEach((key: string) => {
+          promises.push(this.resolveLatAndLong(key));
+      });
+
+      return Promise.all(promises);
+    }
+
+    private resolveLatAndLong(address: string): Promise<string> {
+      return new Promise((resolve, reject) => {
+        try {
+          http.get("http://cs310.students.cs.ubc.ca:11316/api/v1/project_team136/" +
+          encodeURIComponent(address), (response) => {
+            const {statusCode} = response;
+
+            if (statusCode !== 200) {
+              throw new Error("Unable to connect");
+            }
+
+            response.setEncoding("utf8");
+            let rawData = "";
+            response.on("data", (chunk) => {
+              rawData += chunk;
+            });
+
+            response.on("end", () => {
+              try {
+                const parsedData = JSON.parse(rawData);
+                if (typeof parsedData["error"] !== "undefined") {
+                  throw new Error("Unable to get lat and long");
+                }
+                this.indexTable[address]["lon"] = parsedData["lon"];
+                this.indexTable[address]["lat"] = parsedData["lat"];
+                resolve(parsedData["lon"]);
+              } catch (e) {
+              // Log.error(e.message);
+                resolve("");
+                Log.trace(e);
+              }
+            });
+          });
+      } catch (err) {
+        Log.trace(err);
+        resolve("");
+      }
+      });
+    }
+
+    private createIndexTable(html: any): void {
+      html.forEach((row: any) => {
+        if (row["nodeName"] === "tr") {
+          let rowObject = {};
+          let address: string = "";
+          row["childNodes"].forEach((cell: any) => {
+            if (cell["nodeName"] === "td" && cell["attrs"].length !== 0) {
+              this.processCell(cell, rowObject);
+              address = this.checkForAddress(address, cell);
+            }
+          });
+
+          this.indexTable[address] = {...rowObject};
+        }
+      });
+    }
+
+    private processCell(cell: any, rowObject: any): void {
+      let classes = ZipProcessor.buildClassList(cell);
+
+      if (classes.indexOf("views-field-field-building-code") > -1) {
+        rowObject["shortname"] = cell["childNodes"][0]["value"].trim();
+
+      } else if (classes.indexOf("views-field-nothing") > - 1) {
+        let href = "";
+
+        cell["childNodes"].forEach((c: any) => {
+          if (c["nodeName"] === "a") {
+            c["attrs"].forEach((attr: any) => {
+              if (attr["name"] === "href") {
+                href = attr["value"];
+              }
+            });
+          }
+        });
+        rowObject["href"] = href;
+      } else if (classes.indexOf("views-field-title") > - 1) {
+        let fullname = "";
+
+        cell["childNodes"].forEach((c: any) => {
+          if (c["nodeName"] === "a") {
+            c["childNodes"].forEach((cn: any) => {
+              if (cn["nodeName"] === "#text") {
+                fullname = cn["value"];
+              }
+            });
+          }
+        });
+        rowObject["fullname"] = fullname;
+      }
+    }
+
+    private checkForAddress(address: string, cell: any): string {
+      let classes = ZipProcessor.buildClassList(cell);
+
+      if (classes.indexOf("views-field-field-building-address") > -1) {
+        return cell["childNodes"][0]["value"].trim();
+      } else {
+        return address;
+      }
     }
 
     private findTable(parsedHTML: any): any {
@@ -101,25 +216,72 @@ export default class ZipProcessor {
         }
     }
 
-    private obtainBuildingData(table: any): Room[] {
-        const buildingsInfo = table["childNodes"];
-        let rooms: Room[] = [];
-        let buildingsList: Building[] = [];
-        for (let buildingInfo of buildingsInfo) {
-            if (buildingInfo["nodeName"] !== "#text") {
-                const data = buildingInfo["childNodes"];
-                let buildingCode = data[3]["childNodes"][0]["value"].substring(2).trim();
-                let buildingName = data[5]["childNodes"][1]["childNodes"][0]["value"];
-                let address = data[7]["childNodes"][0]["value"].substring(2).trim();
-                let link = data[9]["childNodes"][1]["attrs"][0]["value"];
-                let building = new Building(this.content, buildingCode, buildingName, address, link);
-                buildingsList.push(building);
+    private getRooms(): Promise<Dataset> {
+      let keys = Object.keys(this.indexTable);
+      return new Promise((resolve: any, reject: any) => {
+        let zipFile: JSZip = new JSZip();
+        zipFile.loadAsync(this.content, {base64: true}).then((files) => {
+          let promises: Array<Promise<string>> = [];
+          keys.forEach((obj: any) => {
+            let path: string = "rooms" + this.indexTable[obj]["href"]
+                                        .substring(1, this.indexTable[obj]["href"].length);
+            promises.push(files.file(path).async("text"));
+          });
+
+          return Promise.all(promises);
+        }).then((buildings: any[]) => {
+          if (buildings.length === 0) {
+            reject(new InsightError("No room files in dataset."));
+          }
+
+          let dataset: Dataset = new Dataset(this.id, this.kind);
+          buildings.forEach((building: any, index: number) => {
+            let html = parse5.parse(building);
+            let table = this.findTable(html);
+            if (typeof table !== "undefined") {
+              this.addRoomsToDataset(dataset, table, keys[index]);
             }
+          });
+
+          resolve(dataset);
+        });
+      });
+    }
+
+    private addRoomsToDataset(dataset: Dataset, table: any, address: string): void {
+      table["childNodes"].forEach((row: any) => {
+        if (row["nodeName"] === "tr") {
+          let obj = {};
+          row["childNodes"].forEach((cell: any) => {
+            if (cell["nodeName"] === "td") {
+              Building.dealWithRoomCell(obj, cell);
+            }
+          });
+
+          let newSection = this.addExistingFields(obj, address);
+          dataset.addSection(newSection);
         }
-        for (let building of buildingsList) {
-            let newRooms = building.getRooms();
+      });
+    }
+
+    private addExistingFields(obj: any, address: string): any {
+      let result: any = Object.assign({}, obj, this.indexTable[address]);
+      result["address"] = address;
+      result["href"] = this.studentLink + result["href"].substring(1, result["href"].length);
+      result["name"] = result["shortname"] + "_" + result["number"];
+      return result;
+    }
+
+    public static buildClassList(cell: any): string[] {
+      let classString = "";
+
+      cell["attrs"].forEach((attr: any) => {
+        if (attr["name"] === "class") {
+          classString = classString + attr["value"];
         }
-        return rooms;
+      });
+
+      return classString.split(" ");
     }
 
     private isValidSection(section: any): boolean {
