@@ -25,4 +25,18 @@ export default class Constants {
       furniture: "furniture",
       href: "href"
   };
+
+  public static INDEX_TABLE_CLASSES: string[] = [
+    "views-field-field-building-image",
+    "views-field-field-building-code",
+    "views-field-field-building-address",
+    "views-field-nothing"
+  ];
+
+  public static BUILDING_TABLE_CLASS: string[] = [
+    "views-field-nothing",
+    "views-field-field-building-code",
+    "views-field-title",
+    "views-field-field-building-address"
+  ];
 }

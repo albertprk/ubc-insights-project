@@ -130,6 +130,9 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((resolve, reject) => {
             zipProcessor.processZipContent()
                 .then((data: Dataset) => {
+                    if (data.sections.length === 0) {
+                      reject(new InsightError("Error: No valid files"));
+                    }
                     this.datasets.set(id, data);
                     resolve(Array.from(this.datasets.keys()));
                 }).catch((err: any) => {
@@ -152,7 +155,13 @@ export default class InsightFacade implements IInsightFacade {
               let htmlTable = zipProcessor.findTable(parsedHTML);
               zipProcessor.createIndexTable(htmlTable["childNodes"]);
               return zipProcessor.getLatAndLong();
+              return htmlTable;
+          }).catch((llErr) => {
+              Log.trace("Unable to get Lat and Long");
+              Log.trace(llErr);
+              return zipProcessor.getRooms();
           }).then((result) => {
+              Log.info("getting rooms");
               return zipProcessor.getRooms();
           }).then((data) => {
               this.datasets.set(id, data);
