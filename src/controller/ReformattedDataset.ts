@@ -235,7 +235,7 @@ export default class ReformattedDataset {
       let min = Number.MAX_VALUE;
 
       sections.forEach((section) => {
-        if (section[field] > min) {
+        if (section[field] < min) {
           min = section[field];
         }
       });
