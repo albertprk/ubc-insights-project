@@ -15,6 +15,10 @@ export default class Dataset {
         this.insightDataset.numRows++;
     }
 
+    public setSections(newSections: any[]): void {
+      this.sections = [...newSections];
+    }
+
     public getNumRows() {
         return this.insightDataset.numRows;
     }

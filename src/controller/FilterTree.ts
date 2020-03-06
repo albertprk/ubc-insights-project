@@ -56,7 +56,6 @@ export default class FilterTree {
 
 // TODO: deal with missing sections
   private buildTree(root: TreeNode, sections: any[], transformations: any[]): void {
-    Log.info("BUILDING TREE");
     sections.forEach((section) => {
       let currentRoot = this.root;
       transformations.forEach((rule) => {
@@ -70,7 +69,6 @@ export default class FilterTree {
         currentRoot = child;
       });
     });
-    Log.info("BUILT TREE");
   }
 
   private buildListOfFilters(): any[][] {

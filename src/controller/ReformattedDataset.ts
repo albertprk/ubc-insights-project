@@ -55,9 +55,7 @@ export default class ReformattedDataset {
         let result: any[] = [];
         let groupedSections: any[][] = this.groupSections(sections, query);
         groupedSections = this.applyApplyRules(groupedSections, query["TRANSFORMATIONS"]["APPLY"]);
-        Log.info("APPLIED RULES");
         let flattenedGroup = this.flattenSections(groupedSections, query["OPTIONS"]["COLUMNS"]);
-        Log.info("FLATTENED STUFF");
         flattenedGroup.forEach((section) => {
             let newSection = this.reformatSection(section, query["OPTIONS"]["COLUMNS"]);
             result.push(newSection);
@@ -76,7 +74,6 @@ export default class ReformattedDataset {
     }
 
     private applyApplyRules(sections: any[][], applyRules: any[]): any[][] {
-      Log.info("IN APPLY RULES");
       applyRules.forEach((applyRule) => {
         sections.forEach((section) => {
           let applyKey: string = Object.keys(applyRule)[0];
@@ -84,7 +81,6 @@ export default class ReformattedDataset {
           section[0][applyKey] = applyValue;
         });
       });
-      Log.info("OUT OF APPLY RULES");
 
       return sections;
     }

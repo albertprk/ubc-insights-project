@@ -33,8 +33,6 @@ export default class QueryValidator {
             }
         }
 
-        Log.info("PASSED LOOP");
-
         let result: boolean = true;
 
         try {
@@ -57,14 +55,11 @@ export default class QueryValidator {
                 result =
                     result && OptionValidator.isValidOptions(query["OPTIONS"],
                         dataset, true, transformationValues);
-
-                Log.info("AFTER OPTIONS: " + result);
             } else {
                 result =
                     result && OptionValidator.isValidOptions(query["OPTIONS"], dataset, false, []);
             }
         } catch (err) {
-            Log.info("CAUGHT ERROR");
             Log.trace(err);
             return false;
         }

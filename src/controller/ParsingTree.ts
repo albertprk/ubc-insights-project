@@ -66,23 +66,18 @@ export default class ParsingTree {
             tree.children.forEach((node: TreeNode) => {
                 result = result && this.meetsTreeCriteria(section, node);
             });
-            // Log.info("AND" + result);
         } else if (tree.value === "OR") {
             result = false;
             tree.children.forEach((node: TreeNode) => {
                 result = result || this.meetsTreeCriteria(section, node);
             });
         } else if (tree.value === "EQ") {
-            // Log.info("eq" + this.isEqual(section, tree.children[0]));
             return this.isEqual(section, tree.children[0]);
         } else if (tree.value === "GT") {
-            // Log.info("gt" + this.isGreaterThan(section, tree.children[0]));
             return this.isGreaterThan(section, tree.children[0]);
         } else if (tree.value === "LT") {
-            // Log.info("lt" + this.isLessThan(section, tree.children[0]));
             return this.isLessThan(section, tree.children[0]);
         } else if (tree.value === "IS") {
-            // Log.info("is" + this.matchesIs(section, tree.children[0]));
             return this.matchesIs(section, tree.children[0]);
         } else {
             return false;
@@ -97,7 +92,6 @@ export default class ParsingTree {
         const value: number = tree.children[0].value;
 
         try {
-            // Log.info(this.MFIELD_MAP[mKey]);
             const sectionKey = this.MFIELD_MAP[mKey];
             if (mKey === "year" && section["Section"] === "overall") {
                 return value === 1900;
@@ -119,7 +113,6 @@ export default class ParsingTree {
             if (mKey === "year" && section["Section"] === "overall") {
                 return value < 1900;
             } else if (typeof section[sectionKey] === "undefined") {
-                // Log.info("GT");
                 return false;
             } else {
                 return value < parseFloat(section[sectionKey]);
@@ -137,7 +130,6 @@ export default class ParsingTree {
             if (mKey === "year" && section["Section"] === "overall") {
                 return value > 1900;
             } else if (typeof section[sectionKey] === "undefined") {
-                // Log.info("LT");
                 return false;
             } else {
                 return value > parseFloat(section[sectionKey]);
