@@ -3,6 +3,7 @@ import * as JSZip from "jszip";
 import * as parse5 from "parse5";
 import * as http from "http";
 import Dataset from "./Dataset";
+import Constants from "./Constants";
 import Log from "../Util";
 import {stringify} from "querystring";
 import Room from "./Room";
@@ -51,7 +52,6 @@ export default class ZipProcessor {
                             Log.info("Caught invalid JSON file");
                         }
                     });
-
                     if (dataset.sections.length === 0) {
                         reject(new InsightError("No valid course sections"));
                     }
@@ -62,36 +62,11 @@ export default class ZipProcessor {
         });
     }
 
-    public processRoomsZipContent(): Promise<Dataset> {
-        return new Promise((resolve, reject) => {
-            let zipFile: JSZip = new JSZip();
-            let dataset = new Dataset(this.id, this.kind);
-            let parsedHTML: any;
-            zipFile.loadAsync(this.content, {base64: true}).then((files) => {
-                let promises: Array<Promise<string>> = [];
-                promises.push(files.folder("rooms").file("index.htm").async("text"));
-                return Promise.all(promises);
-            }).then((html) => {
-                parsedHTML = parse5.parse(html[0]);
-                let htmlTable = this.findTable(parsedHTML);
-                this.createIndexTable(htmlTable["childNodes"]);
-                return this.getLatAndLong();
-            }).then((result) => {
-                return this.getRooms();
-            }).then((datasetResult) => {
-                resolve(datasetResult);
-            }).catch((err) => {
-                reject(err);
-            });
-        });
-    }
-
-    public async getLatAndLong(): Promise<string[]> {
+    public getLatAndLong(): Promise<string[]> {
       let promises: Array<Promise<string>> = [];
       Object.keys(this.indexTable).forEach((key: string) => {
           promises.push(this.resolveLatAndLong(key));
       });
-
       return Promise.all(promises);
     }
 
@@ -116,15 +91,15 @@ export default class ZipProcessor {
               try {
                 const parsedData = JSON.parse(rawData);
                 if (typeof parsedData["error"] !== "undefined") {
-                  throw new Error("Unable to get lat and long");
+                  Log.trace("Unable to get lat and long, inside method");
+                  resolve("");
+                } else {
+                  this.indexTable[address]["lon"] = parsedData["lon"];
+                  this.indexTable[address]["lat"] = parsedData["lat"];
+                  resolve(parsedData["lon"]);
                 }
-                this.indexTable[address]["lon"] = parsedData["lon"];
-                this.indexTable[address]["lat"] = parsedData["lat"];
-                resolve(parsedData["lon"]);
               } catch (e) {
-              // Log.error(e.message);
                 resolve("");
-                Log.trace(e);
               }
             });
           });
@@ -146,7 +121,6 @@ export default class ZipProcessor {
               address = this.checkForAddress(address, cell);
             }
           });
-
           this.indexTable[address] = {...rowObject};
         }
       });
@@ -157,7 +131,6 @@ export default class ZipProcessor {
 
       if (classes.indexOf("views-field-field-building-code") > -1) {
         rowObject["shortname"] = cell["childNodes"][0]["value"].trim();
-
       } else if (classes.indexOf("views-field-nothing") > - 1) {
         let href = "";
 
@@ -198,7 +171,9 @@ export default class ZipProcessor {
     }
 
     public findTable(parsedHTML: any): any {
-        if (parsedHTML["nodeName"] === "tbody") {
+        if (parsedHTML["nodeName"] === "tbody" &&
+        (this.isValidIndexTable(parsedHTML) ||
+        this.isValidTable(parsedHTML))) {
             return parsedHTML;
         } else {
             if (!parsedHTML.hasOwnProperty("childNodes") || parsedHTML["childNodes"].length === 0 ||
@@ -216,6 +191,31 @@ export default class ZipProcessor {
         }
     }
 
+    private isValidIndexTable(table: any): boolean {
+      let result = false;
+
+      table["childNodes"].forEach((row: any) => {
+        if (row["nodeName"] === "tr") {
+          row["childNodes"].forEach((cell: any) => {
+            if (cell["nodeName"] === "td") {
+              let classes: string[] = ZipProcessor.buildClassList(cell);
+
+              for (let c in classes) {
+                if (Constants.INDEX_TABLE_CLASSES.indexOf(c) > -1) {
+                  result = true;
+                }
+              }
+            }
+          });
+        }
+      });
+      return false;
+    }
+
+    private isValidTable(table: any): boolean {
+      return true;
+    }
+
     public async getRooms(): Promise<Dataset> {
       let keys = Object.keys(this.indexTable);
       return new Promise((resolve: any, reject: any) => {
@@ -227,7 +227,6 @@ export default class ZipProcessor {
                                         .substring(1, this.indexTable[obj]["href"].length);
             promises.push(files.file(path).async("text"));
           });
-
           return Promise.all(promises);
         }).then((buildings: any[]) => {
           if (buildings.length === 0) {
@@ -268,13 +267,15 @@ export default class ZipProcessor {
       let result: any = Object.assign({}, obj, this.indexTable[address]);
       result["address"] = address;
       result["href"] = this.studentLink + result["href"].substring(1, result["href"].length);
+      let lastSlashIndex: number = result["href"].indexOf(result["shortname"]);
+      const ending: string = result["shortname"] + "-" + result["number"];
+      result["href"] = result["href"].substring(0, lastSlashIndex) + "room/" + ending;
       result["name"] = result["shortname"] + "_" + result["number"];
       return result;
     }
 
     public static buildClassList(cell: any): string[] {
       let classString = "";
-
       cell["attrs"].forEach((attr: any) => {
         if (attr["name"] === "class") {
           classString = classString + attr["value"];
