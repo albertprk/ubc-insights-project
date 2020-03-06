@@ -1,0 +1,43 @@
+{
+    "title": "single result for transformations",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "LT": {
+                        "courses_avg": 90
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_dept": "aanb"
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_fail"
+            ],
+            "ORDER": "courses_dept"
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title",
+                "courses_dept",
+                "courses_avg",
+                "courses_fail"
+            ],
+            "APPLY": [
+                {
+                    "overallAvg": {
+                        "AVG": "courses_avg"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+"result":[{"courses_dept":"aanb","courses_avg":87.83,"courses_fail":0}]}

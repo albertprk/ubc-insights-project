@@ -1,0 +1,42 @@
+{
+    "title": "Invalid column value, not in transformmation",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "LT": {
+                        "courses_avg": 90
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_dept": "aanb"
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_fail"
+            ],
+            "ORDER": "courses_dept"
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title",
+                "courses_avg",
+                "courses_fail"
+            ],
+            "APPLY": [
+                {
+                    "overallAvg": {
+                        "AVG": "courses_avg"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"}

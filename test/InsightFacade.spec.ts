@@ -39,6 +39,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         notInCourses: "./test/data/notInCourses.zip",
         emptySections: "./test/data/onlyEmptySections.zip",
         invalidSections: "./test/data/allInvalidSections.zip",
+        rooms: "./test/data/rooms.zip"
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -76,7 +77,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
         Log.test(`AfterTest: ${this.currentTest.title}`);
     });
 
-    // This is a unit test. You should create more like this!
     it("Should add a valid dataset", function () {
         const id: string = "courses";
         const expected: string[] = [id];
@@ -86,6 +86,37 @@ describe("InsightFacade Add/Remove Dataset", function () {
                 expect(result).to.deep.equal(expected);
             })
             .catch((err: any) => {
+                expect.fail(err, expected, "Should not have rejected");
+            });
+    });
+
+    it("Should add a valid rooms dataset", function () {
+        const id: string = "rooms";
+        const expected: string[] = [id];
+        return insightFacade
+            .addDataset(id, datasets[id], InsightDatasetKind.Rooms)
+            .then((result: string[]) => {
+                expect(result).to.deep.equal(expected);
+            })
+            .catch((err: any) => {
+                Log.trace(err);
+                expect.fail(err, expected, "Should not have rejected");
+            });
+    });
+
+    it("Should add a valid rooms and coursers dataset", function () {
+        const id: string = "rooms";
+        const id2: string = "courses";
+        const expected: string[] = [id, id2];
+        return insightFacade
+            .addDataset(id, datasets[id], InsightDatasetKind.Rooms)
+            .then((result: string[]) => {
+                return insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses);
+            }).then((result2) => {
+              expect(result2).to.deep.equal(expected);
+            })
+            .catch((err: any) => {
+                Log.trace(err);
                 expect.fail(err, expected, "Should not have rejected");
             });
     });
@@ -212,6 +243,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     it("Should be be able to store multiple different datasets", function () {
         const id1: string = "courses";
         const id2: string = "secondCourses";
+        const id3: string = "rooms";
         const expected: string[] = [id1, id2];
         return insightFacade
             .addDataset(id1, datasets[id1], InsightDatasetKind.Courses)
@@ -230,8 +262,14 @@ describe("InsightFacade Add/Remove Dataset", function () {
             })
             .then((result4: InsightDataset[]) => {
                 expect(result4.length).to.equal(expected.length);
+                return insightFacade.addDataset(id3, datasets[id3], InsightDatasetKind.Rooms);
+            }).then((result5) => {
+                return insightFacade.listDatasets();
+            }).then((result6) => {
+              expect(result6.length).to.deep.equal(3);
             })
             .catch((err: any) => {
+                Log.trace(err);
                 expect.fail(err, expected, "Should not have rejected");
             });
     });
@@ -498,18 +536,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
             });
     });
 
-    it("addDataSet should fail due to Rooms kind in C0", function () {
-        const id: string = "anyId";
-        return insightFacade
-            .addDataset(id, datasets["coursers"], InsightDatasetKind.Rooms)
-            .then((result: string[]) => {
-                expect.fail(result, "Should not rejected");
-            })
-            .catch((err: any) => {
-                expect(err).to.be.an.instanceOf(InsightError);
-            });
-    });
-
     it("removeDataSet Should fail due to null id", function () {
         const id: string = null;
         return insightFacade
@@ -532,6 +558,25 @@ describe("InsightFacade Add/Remove Dataset", function () {
             })
             .then((res2: string) => {
                 expect(res2).to.eq(id);
+            })
+            .catch((err: any) => {
+                expect.fail(err, expected, "Should not have rejected");
+            });
+    });
+
+    it("Should successfully remove rooms dataSet that exists in memory", function () {
+        const id: string = "rooms";
+        const expected: string[] = [id];
+        return insightFacade
+            .addDataset(id, datasets[id], InsightDatasetKind.Rooms)
+            .then((res1: string[]) => {
+                return insightFacade.removeDataset(id);
+            })
+            .then((res2: string) => {
+                expect(res2).to.eq(id);
+                return insightFacade.listDatasets();
+            }).then((res3) => {
+                expect(res3.length).to.equal(0);
             })
             .catch((err: any) => {
                 expect.fail(err, expected, "Should not have rejected");
@@ -663,6 +708,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
 });
 
+
 /*
  * This test suite dynamically generates tests from the JSON files in test/queries.
  * You should not need to modify it; instead, add additional files to the queries directory.
@@ -675,7 +721,7 @@ describe("InsightFacade PerformQuery", () => {
         courses: {
             path: "./test/data/courses.zip",
             kind: InsightDatasetKind.Courses,
-        },
+        }
     };
     let insightFacade: InsightFacade;
     let testQueries: ITestQuery[] = [];
@@ -701,6 +747,7 @@ describe("InsightFacade PerformQuery", () => {
         const loadDatasetPromises: Array<Promise<string[]>> = [];
         insightFacade = new InsightFacade();
         for (const id of Object.keys(datasetsToQuery)) {
+            Log.info("MY QUERYING ID IS: " + id);
             const ds = datasetsToQuery[id];
             const data = fs.readFileSync(ds.path).toString("base64");
             loadDatasetPromises.push(
@@ -708,6 +755,8 @@ describe("InsightFacade PerformQuery", () => {
             );
         }
         return Promise.all(loadDatasetPromises).catch((err) => {
+            Log.info("I cAUGHT AN ERROR!!!");
+            Log.trace(err);
             /* *IMPORTANT NOTE: This catch is to let this run even without the implemented addDataset,
              * for the purposes of seeing all your tests run.
              * TODO For C1, remove this catch block (but keep the Promise.all)
@@ -730,18 +779,17 @@ describe("InsightFacade PerformQuery", () => {
 
     // Dynamically create and run a test for each query in testQueries
     // Creates an extra "test" called "Should run test queries" as a byproduct. Don't worry about it
+    // Dynamically create and run a test for each query in testQueries.
+    // Creates an extra "test" called "Should run test queries" as a byproduct.
     it("Should run test queries", function () {
         describe("Dynamic InsightFacade PerformQuery tests", function () {
             for (const test of testQueries) {
                 it(`[${test.filename}] ${test.title}`, function (done) {
+                    const resultChecker = TestUtil.getQueryChecker(test, done);
                     insightFacade
                         .performQuery(test.query)
-                        .then((result) => {
-                            TestUtil.checkQueryResult(test, result, done);
-                        })
-                        .catch((err) => {
-                            TestUtil.checkQueryResult(test, err, done);
-                        });
+                        .then(resultChecker)
+                        .catch(resultChecker);
                 });
             }
         });
