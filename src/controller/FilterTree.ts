@@ -1,34 +1,9 @@
 import Log from "../Util";
 import TreeNode from "./TreeNode";
+import Constants from "./Constants";
 
 export default class FilterTree {
   private root: TreeNode;
-
-  public MFIELD_MAP: Record<string, string> = {
-      avg: "Avg",
-      pass: "Pass",
-      fail: "Fail",
-      audit: "Audit",
-      year: "Year",
-      lat: "lat",
-      lon: "lon"
-  };
-
-  public SFIELD_MAP: Record<string, string> = {
-      dept: "Subject",
-      id: "Course",
-      instructor: "Professor",
-      title: "Title",
-      uuid: "id",
-      fullname: "fullname",
-      shortname: "shortname",
-      number: "number",
-      name: "name",
-      address: "address",
-      type: "type",
-      furniture: "furniture",
-      href: "href"
-  };
 
   constructor(sections: any[], transformations: any[]) {
     this.root = new TreeNode("Parent");
@@ -44,10 +19,10 @@ export default class FilterTree {
       let index = rule.indexOf("_");
       const field: string = rule.substring(index + 1, rule.length);
 
-      if (typeof this.MFIELD_MAP[field] !== "undefined") {
-        result.push(this.MFIELD_MAP[field]);
-      } else if (typeof this.SFIELD_MAP[field] !== "undefined") {
-        result.push(this.SFIELD_MAP[field]);
+      if (typeof Constants.MFIELD_MAP[field] !== "undefined") {
+        result.push(Constants.MFIELD_MAP[field]);
+      } else if (typeof Constants.SFIELD_MAP[field] !== "undefined") {
+        result.push(Constants.SFIELD_MAP[field]);
       }
     });
 

@@ -68,25 +68,25 @@ export default class ZipProcessor {
             let dataset = new Dataset(this.id, this.kind);
             let parsedHTML: any;
             zipFile.loadAsync(this.content, {base64: true}).then((files) => {
-                files.folder("rooms").file("index.htm").async("text").then((html: string) => {
-                    parsedHTML = parse5.parse(html);
-                    return parsedHTML;
-                }).then(() => {
-                    let htmlTable = this.findTable(parsedHTML);
-                    this.createIndexTable(htmlTable["childNodes"]);
-                    return this.getLatAndLong();
-                }).then((result) => {
-                    return this.getRooms();
-                }).then((datasetResult) => {
-                    resolve(datasetResult);
-                });
+                let promises: Array<Promise<string>> = [];
+                promises.push(files.folder("rooms").file("index.htm").async("text"));
+                return Promise.all(promises);
+            }).then((html) => {
+                parsedHTML = parse5.parse(html[0]);
+                let htmlTable = this.findTable(parsedHTML);
+                this.createIndexTable(htmlTable["childNodes"]);
+                return this.getLatAndLong();
+            }).then((result) => {
+                return this.getRooms();
+            }).then((datasetResult) => {
+                resolve(datasetResult);
             }).catch((err) => {
                 reject(err);
             });
         });
     }
 
-    private getLatAndLong(): Promise<string[]> {
+    public async getLatAndLong(): Promise<string[]> {
       let promises: Array<Promise<string>> = [];
       Object.keys(this.indexTable).forEach((key: string) => {
           promises.push(this.resolveLatAndLong(key));
@@ -135,7 +135,7 @@ export default class ZipProcessor {
       });
     }
 
-    private createIndexTable(html: any): void {
+    public createIndexTable(html: any): void {
       html.forEach((row: any) => {
         if (row["nodeName"] === "tr") {
           let rowObject = {};
@@ -197,7 +197,7 @@ export default class ZipProcessor {
       }
     }
 
-    private findTable(parsedHTML: any): any {
+    public findTable(parsedHTML: any): any {
         if (parsedHTML["nodeName"] === "tbody") {
             return parsedHTML;
         } else {
@@ -216,7 +216,7 @@ export default class ZipProcessor {
         }
     }
 
-    private getRooms(): Promise<Dataset> {
+    public async getRooms(): Promise<Dataset> {
       let keys = Object.keys(this.indexTable);
       return new Promise((resolve: any, reject: any) => {
         let zipFile: JSZip = new JSZip();

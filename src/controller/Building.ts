@@ -35,7 +35,8 @@ export default class Building {
 
         cell["childNodes"].forEach((c: any) => {
           if (c["nodeName"] === "#text") {
-            capacity = parseInt(c["value"].trim(), 10);
+            let amountOfseats = c["value"].trim();
+            capacity = parseInt(amountOfseats, 10);
           }
         });
         obj["seats"] = capacity;
