@@ -1,5 +1,6 @@
 import TreeNode from "./TreeNode";
 import Log from "../Util";
+import Constants from "./Constants";
 import { ResultTooLargeError } from "./IInsightFacade";
 import Dataset from "./Dataset";
 
@@ -7,32 +8,6 @@ export default class ParsingTree {
     constructor() {
         Log.trace("ParsingTree::init()");
     }
-
-    public MFIELD_MAP: Record<string, string> = {
-        avg: "Avg",
-        pass: "Pass",
-        fail: "Fail",
-        audit: "Audit",
-        year: "Year",
-        lat: "lat",
-        lon: "lon"
-    };
-
-    public SFIELD_MAP: Record<string, string> = {
-        dept: "Subject",
-        id: "Course",
-        instructor: "Professor",
-        title: "Title",
-        uuid: "id",
-        fullname: "fullname",
-        shortname: "shortname",
-        number: "number",
-        name: "name",
-        address: "address",
-        type: "type",
-        furniture: "furniture",
-        href: "href"
-    };
 
     public createTreeNode(query: any): TreeNode {
         let root: TreeNode;
@@ -92,7 +67,7 @@ export default class ParsingTree {
         const value: number = tree.children[0].value;
 
         try {
-            const sectionKey = this.MFIELD_MAP[mKey];
+            const sectionKey = Constants.MFIELD_MAP[mKey];
             if (mKey === "year" && section["Section"] === "overall") {
                 return value === 1900;
             } else if (typeof section[sectionKey] === "undefined") {
@@ -109,7 +84,7 @@ export default class ParsingTree {
         const mKey: string = tree.value.split("_")[1];
         const value: any = tree.children[0].value;
         try {
-            const sectionKey = this.MFIELD_MAP[mKey];
+            const sectionKey = Constants.MFIELD_MAP[mKey];
             if (mKey === "year" && section["Section"] === "overall") {
                 return value < 1900;
             } else if (typeof section[sectionKey] === "undefined") {
@@ -126,7 +101,7 @@ export default class ParsingTree {
         const mKey: string = tree.value.split("_")[1];
         const value: number = tree.children[0].value;
         try {
-            const sectionKey = this.MFIELD_MAP[mKey];
+            const sectionKey = Constants.MFIELD_MAP[mKey];
             if (mKey === "year" && section["Section"] === "overall") {
                 return value > 1900;
             } else if (typeof section[sectionKey] === "undefined") {
@@ -143,7 +118,7 @@ export default class ParsingTree {
         const sKey: string = tree.value.split("_")[1];
         const value: string = tree.children[0].value;
         try {
-            const sectionKey: string = this.SFIELD_MAP[sKey];
+            const sectionKey: string = Constants.SFIELD_MAP[sKey];
 
             if (typeof section[sectionKey] === "undefined") {
                 return false;

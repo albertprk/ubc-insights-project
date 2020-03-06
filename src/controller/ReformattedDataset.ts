@@ -1,37 +1,12 @@
 import Log from "../Util";
 import FilterTree from "./FilterTree";
+import Constants from "./Constants";
 import {Decimal} from "decimal.js";
 
 export default class ReformattedDataset {
     constructor() {
         Log.trace("ReformattedDataset::init()");
     }
-
-    public MFIELD_MAP: Record<string, string> = {
-        avg: "Avg",
-        pass: "Pass",
-        fail: "Fail",
-        audit: "Audit",
-        year: "Year",
-        lat: "lat",
-        lon: "lon"
-    };
-
-    public SFIELD_MAP: Record<string, string> = {
-        dept: "Subject",
-        id: "Course",
-        instructor: "Professor",
-        title: "Title",
-        uuid: "id",
-        fullname: "fullname",
-        shortname: "shortname",
-        number: "number",
-        name: "name",
-        address: "address",
-        type: "type",
-        furniture: "furniture",
-        href: "href"
-    };
 
     public reformatSections(sections: any[], query: any): any[] {
       if (typeof query["TRANSFORMATIONS"] === "undefined") {
@@ -115,7 +90,7 @@ export default class ReformattedDataset {
             let counter = 0;
 
             while (result === 0 && counter < order["keys"].length)  {
-                if (order.length === 0) {
+                if (order["keys"].length === 0) {
                     return 0;
                 }
 
@@ -132,8 +107,10 @@ export default class ReformattedDataset {
 
     private sortSectionHelper(a: any, b: any, order: string): number {
         if (typeof a[order] === "string" && a[order] < b[order]) {
-            return -1;
+            // return (a === "") ? 1 : -1;
+            return - 1;
         } else if (typeof a[order] === "string" && a[order] > b[order]) {
+            // return (b === "") ? -1 : 1;
             return 1;
         } else if (typeof a[order] === "string") {
             return 0;
@@ -153,24 +130,24 @@ export default class ReformattedDataset {
                 const key: string = col.split("_")[1];
 
                 if (
-                    typeof section[this.MFIELD_MAP[key]] !== "undefined" &&
+                    typeof section[Constants.MFIELD_MAP[key]] !== "undefined" &&
                     key === "year"
                 ) {
                     reformattedSection[col] =
                         key === "year" && section["Section"] === "overall"
                             ? 1900
-                            : parseInt(section[this.MFIELD_MAP[key]], 10);
+                            : parseInt(section[Constants.MFIELD_MAP[key]], 10);
                 } else if (
-                    typeof section[this.MFIELD_MAP[key]] !== "undefined"
+                    typeof section[Constants.MFIELD_MAP[key]] !== "undefined"
                 ) {
-                    reformattedSection[col] = section[this.MFIELD_MAP[key]];
+                    reformattedSection[col] = section[Constants.MFIELD_MAP[key]];
                 } else if (
-                    typeof section[this.SFIELD_MAP[key]] !== "undefined"
+                    typeof section[Constants.SFIELD_MAP[key]] !== "undefined"
                 ) {
                     reformattedSection[col] =
                         key === "uuid"
-                            ? section[this.SFIELD_MAP[key]].toString()
-                            : section[this.SFIELD_MAP[key]];
+                            ? section[Constants.SFIELD_MAP[key]].toString()
+                            : section[Constants.SFIELD_MAP[key]];
                 } else if (col.indexOf("_") === -1) {
                     reformattedSection[col] = section[col];
                 } else {
@@ -189,7 +166,6 @@ export default class ReformattedDataset {
       let value: any = applyRule[applyKey][rule];
       let index: number = value.indexOf("_");
       value = value.substring(index + 1, value.length);
-
 
       if (rule === "MAX") {
         return this.calculateMax(sections, value);
@@ -268,10 +244,10 @@ export default class ReformattedDataset {
     }
 
     private determineField(value: any): string {
-      if (typeof this.SFIELD_MAP[value] === "undefined") {
-        return this.MFIELD_MAP[value];
+      if (typeof Constants.SFIELD_MAP[value] === "undefined") {
+        return Constants.MFIELD_MAP[value];
       } else {
-        return this.SFIELD_MAP[value];
+        return Constants.SFIELD_MAP[value];
       }
     }
 
