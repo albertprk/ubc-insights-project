@@ -104,7 +104,6 @@ export default class OptionValidator {
         dataset: string,
         columnValues: string[],
     ): boolean {
-
         let result: boolean = this.isValidAnyKeyOrder(query, dataset, columnValues) ||
         this.isValidDirectionOrder(query, dataset, columnValues);
 
@@ -128,6 +127,11 @@ export default class OptionValidator {
         columnValues: string[],
     ): boolean {
         let result = true;
+        if (typeof query["dir"] === "undefined" || typeof query["keys"] === "undefined") {
+          return false;
+        } else if (query["keys"].length === 0) {
+          return false;
+        }
 
         Object.keys(query).forEach((key: any) => {
           if (key === "dir") {
