@@ -1,0 +1,48 @@
+{
+    "title": "Valid sum of lat",
+    "query": {
+  "WHERE": {
+    "AND": [
+      {
+        "IS": {
+          "rooms_furniture": "*Tables*"
+        }
+      },
+      {
+        "GT": {
+          "rooms_seats": 300
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "rooms_shortname",
+      "rooms_href",
+      "rooms_lat",
+      "sumLat"
+    ],
+    "ORDER": {
+      "dir": "DOWN",
+      "keys": [
+        "sumLat"
+      ]
+    }
+  },
+  "TRANSFORMATIONS": {
+    "GROUP": [
+      "rooms_shortname",
+      "rooms_href",
+      "rooms_lat"
+    ],
+    "APPLY": [
+      {
+        "sumLat": {
+          "MAX": "rooms_lat"
+        }
+      }
+    ]
+  }
+},
+    "isQueryValid": true,
+  "result":[{"rooms_shortname":"HEBB","rooms_href":"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/HEBB-100","rooms_lat":49.2661,"sumLat":49.2661},{"rooms_shortname":"LSC","rooms_href":"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/LSC-1001","rooms_lat":49.26236,"sumLat":49.26236},{"rooms_shortname":"LSC","rooms_href":"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/LSC-1002","rooms_lat":49.26236,"sumLat":49.26236},{"rooms_shortname":"OSBO","rooms_href":"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/OSBO-A","rooms_lat":49.26047,"sumLat":49.26047}]}
