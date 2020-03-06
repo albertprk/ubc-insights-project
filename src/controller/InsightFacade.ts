@@ -130,6 +130,9 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((resolve, reject) => {
             zipProcessor.processZipContent()
                 .then((data: Dataset) => {
+                    if (data.sections.length === 0) {
+                      reject(new InsightError("Error: No valid files"));
+                    }
                     this.datasets.set(id, data);
                     resolve(Array.from(this.datasets.keys()));
                 }).catch((err: any) => {
