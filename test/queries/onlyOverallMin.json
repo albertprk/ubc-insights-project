@@ -1,0 +1,30 @@
+{
+    "title": "Only min",
+    "query": {
+  "WHERE": {},
+  "OPTIONS": {
+    "COLUMNS": [
+      "overallMin"
+    ],
+    "ORDER": {
+      "dir": "DOWN",
+      "keys": [
+        "overallMin"
+      ]
+    }
+  },
+  "TRANSFORMATIONS": {
+    "GROUP": [
+      "courses_dept"
+    ],
+    "APPLY": [
+      {
+        "overallMin": {
+          "MIN": "courses_avg"
+        }
+      }
+    ]
+  }
+},
+    "isQueryValid": true,
+  "result":[{"overallMin":87.83},{"overallMin":87.33},{"overallMin":86.33},{"overallMin":85.57},{"overallMin":85.4},{"overallMin":84.9},{"overallMin":84.8},{"overallMin":84.59},{"overallMin":84.29},{"overallMin":84},{"overallMin":83.67},{"overallMin":83.45},{"overallMin":83.43},{"overallMin":83},{"overallMin":81.6},{"overallMin":81.32},{"overallMin":80.28},{"overallMin":80.16},{"overallMin":80},{"overallMin":79.75},{"overallMin":79.7},{"overallMin":79.22},{"overallMin":79},{"overallMin":78.97},{"overallMin":78.72},{"overallMin":78.6},{"overallMin":78.55},{"overallMin":78.51},{"overallMin":78.18},{"overallMin":78.17},{"overallMin":78},{"overallMin":78},{"overallMin":77.99},{"overallMin":77.98},{"overallMin":77.89},{"overallMin":77.88},{"overallMin":77.68},{"overallMin":77.62},{"overallMin":77.57},{"overallMin":77.5},{"overallMin":77.36},{"overallMin":77.2},{"overallMin":76.77},{"overallMin":76.63},{"overallMin":76.43},{"overallMin":76.39},{"overallMin":76.18},{"overallMin":76.09},{"overallMin":75.79},{"overallMin":75.76},{"overallMin":75.63},{"overallMin":75.63},{"overallMin":75.54},{"overallMin":75.4},{"overallMin":75.25},{"overallMin":74.96},{"overallMin":74.58},{"overallMin":74.57},{"overallMin":74.5},{"overallMin":74.42},{"overallMin":74.39},{"overallMin":74.33},{"overallMin":74.21},{"overallMin":74.07},{"overallMin":73.56},{"overallMin":73.56},{"overallMin":73.47},{"overallMin":73.43},{"overallMin":73.38},{"overallMin":73.34},{"overallMin":73},{"overallMin":73},{"overallMin":72.95},{"overallMin":72.76},{"overallMin":72.75},{"overallMin":72.6},{"overallMin":72.31},{"overallMin":72.18},{"overallMin":72.14},{"overallMin":72.07},{"overallMin":71.92},{"overallMin":71.3},{"overallMin":71.27},{"overallMin":71.17},{"overallMin":70.69},{"overallMin":70.66},{"overallMin":70.4},{"overallMin":70.3},{"overallMin":70.11},{"overallMin":70},{"overallMin":69.76},{"overallMin":69.41},{"overallMin":69.34},{"overallMin":69.28},{"overallMin":69.25},{"overallMin":68.53},{"overallMin":68.5},{"overallMin":68.4},{"overallMin":68.23},{"overallMin":68.06},{"overallMin":68},{"overallMin":67.78},{"overallMin":67.73},{"overallMin":67.64},{"overallMin":67.5},{"overallMin":67.43},{"overallMin":67.11},{"overallMin":66.8},{"overallMin":66.38},{"overallMin":66.37},{"overallMin":65.9},{"overallMin":65.81},{"overallMin":65.75},{"overallMin":65.67},{"overallMin":65.64},{"overallMin":65.58},{"overallMin":65.55},{"overallMin":65.5},{"overallMin":65.5},{"overallMin":65.44},{"overallMin":65.38},{"overallMin":65.12},{"overallMin":65.07},{"overallMin":65},{"overallMin":64.89},{"overallMin":64.67},{"overallMin":64.67},{"overallMin":64.5},{"overallMin":64.13},{"overallMin":64},{"overallMin":63.78},{"overallMin":63.59},{"overallMin":63.14},{"overallMin":62.81},{"overallMin":62.74},{"overallMin":62.63},{"overallMin":62.5},{"overallMin":62.5},{"overallMin":62.33},{"overallMin":62.22},{"overallMin":61.97},{"overallMin":61.45},{"overallMin":61.36},{"overallMin":61.21},{"overallMin":61.03},{"overallMin":61},{"overallMin":60.89},{"overallMin":60.67},{"overallMin":60.6},{"overallMin":60.25},{"overallMin":60.05},{"overallMin":60},{"overallMin":59.61},{"overallMin":59.06},{"overallMin":58.4},{"overallMin":58.33},{"overallMin":58},{"overallMin":57.68},{"overallMin":57.4},{"overallMin":57.33},{"overallMin":57.2},{"overallMin":57},{"overallMin":56.77},{"overallMin":55.96},{"overallMin":55.25},{"overallMin":54.81},{"overallMin":54.43},{"overallMin":54.01},{"overallMin":53.86},{"overallMin":53.64},{"overallMin":53.5},{"overallMin":52.67},{"overallMin":52.08},{"overallMin":51.25},{"overallMin":47.29},{"overallMin":46.71},{"overallMin":46.52},{"overallMin":43.33},{"overallMin":42.5},{"overallMin":42},{"overallMin":39.03},{"overallMin":34},{"overallMin":33.2},{"overallMin":33},{"overallMin":4.5},{"overallMin":4},{"overallMin":1},{"overallMin":0},{"overallMin":0}]}

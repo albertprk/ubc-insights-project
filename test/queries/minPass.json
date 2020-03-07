@@ -1,0 +1,30 @@
+{
+    "title": "Only min pass",
+    "query": {
+  "WHERE": {},
+  "OPTIONS": {
+    "COLUMNS": [
+      "overallMin"
+    ],
+    "ORDER": {
+      "dir": "DOWN",
+      "keys": [
+        "overallMin"
+      ]
+    }
+  },
+  "TRANSFORMATIONS": {
+    "GROUP": [
+      "courses_dept"
+    ],
+    "APPLY": [
+      {
+        "overallMin": {
+          "MIN": "courses_pass"
+        }
+      }
+    ]
+  }
+},
+    "isQueryValid": true,
+"result":[{"overallMin":65},{"overallMin":42},{"overallMin":40},{"overallMin":28},{"overallMin":23},{"overallMin":23},{"overallMin":20},{"overallMin":20},{"overallMin":19},{"overallMin":19},{"overallMin":17},{"overallMin":14},{"overallMin":13},{"overallMin":13},{"overallMin":13},{"overallMin":13},{"overallMin":13},{"overallMin":12},{"overallMin":12},{"overallMin":12},{"overallMin":12},{"overallMin":12},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":10},{"overallMin":10},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":1},{"overallMin":0},{"overallMin":0},{"overallMin":0},{"overallMin":0},{"overallMin":0}]}
