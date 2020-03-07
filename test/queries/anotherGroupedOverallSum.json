@@ -1,0 +1,47 @@
+{
+    "title": "another grouped course",
+    "query": {
+  "WHERE": {
+    "AND": [
+      {
+        "LT": {
+          "courses_avg": 90
+        }
+      },
+      {
+        "IS": {
+          "courses_dept": "*cb"
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_fail",
+      "overallAvg"
+    ],
+    "ORDER": {
+      "dir": "UP",
+      "keys": [
+        "courses_dept",
+        "overallAvg"
+      ]
+    }
+  },
+  "TRANSFORMATIONS": {
+    "GROUP": [
+      "courses_dept",
+      "courses_fail"
+    ],
+    "APPLY": [
+      {
+        "overallAvg": {
+          "SUM": "courses_avg"
+        }
+      }
+    ]
+  }
+},
+"isQueryValid": true,
+"result":[{"courses_dept":"micb","courses_fail":17,"overallAvg":64.77},{"courses_dept":"micb","courses_fail":23,"overallAvg":71.36},{"courses_dept":"micb","courses_fail":39,"overallAvg":72.43},{"courses_dept":"micb","courses_fail":47,"overallAvg":73.67},{"courses_dept":"micb","courses_fail":35,"overallAvg":74.03},{"courses_dept":"micb","courses_fail":18,"overallAvg":75.11},{"courses_dept":"micb","courses_fail":24,"overallAvg":75.14},{"courses_dept":"micb","courses_fail":43,"overallAvg":75.86},{"courses_dept":"micb","courses_fail":16,"overallAvg":76},{"courses_dept":"micb","courses_fail":30,"overallAvg":136.12},{"courses_dept":"micb","courses_fail":25,"overallAvg":139.05},{"courses_dept":"micb","courses_fail":13,"overallAvg":141},{"courses_dept":"micb","courses_fail":20,"overallAvg":142.5},{"courses_dept":"micb","courses_fail":19,"overallAvg":147.72},{"courses_dept":"micb","courses_fail":14,"overallAvg":147.93},{"courses_dept":"micb","courses_fail":28,"overallAvg":213.53},{"courses_dept":"micb","courses_fail":9,"overallAvg":284.9},{"courses_dept":"micb","courses_fail":12,"overallAvg":287.74},{"courses_dept":"micb","courses_fail":15,"overallAvg":342.61},{"courses_dept":"micb","courses_fail":6,"overallAvg":376.71},{"courses_dept":"micb","courses_fail":26,"overallAvg":418.69},{"courses_dept":"micb","courses_fail":10,"overallAvg":516.41},{"courses_dept":"micb","courses_fail":8,"overallAvg":518.25},{"courses_dept":"micb","courses_fail":11,"overallAvg":520.13},{"courses_dept":"micb","courses_fail":3,"overallAvg":667.72},{"courses_dept":"micb","courses_fail":7,"overallAvg":808.04},{"courses_dept":"micb","courses_fail":4,"overallAvg":968.79},{"courses_dept":"micb","courses_fail":5,"overallAvg":1198.87},{"courses_dept":"micb","courses_fail":2,"overallAvg":1420.27},{"courses_dept":"micb","courses_fail":1,"overallAvg":2627.98},{"courses_dept":"micb","courses_fail":0,"overallAvg":23492.89}]}

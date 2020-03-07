@@ -1,0 +1,30 @@
+{
+    "title": "Count years",
+    "query": {
+  "WHERE": {},
+  "OPTIONS": {
+    "COLUMNS": [
+      "overallMin"
+    ],
+    "ORDER": {
+      "dir": "DOWN",
+      "keys": [
+        "overallMin"
+      ]
+    }
+  },
+  "TRANSFORMATIONS": {
+    "GROUP": [
+      "courses_dept"
+    ],
+    "APPLY": [
+      {
+        "overallMin": {
+          "COUNT": "courses_year"
+        }
+      }
+    ]
+  }
+},
+    "isQueryValid": true,
+"result":[{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":11},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":10},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":9},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":8},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":7},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":6},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":5},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":4},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":3},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":2},{"overallMin":1}]}
