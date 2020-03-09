@@ -186,9 +186,14 @@ export default class ReformattedDataset {
       let field = this.determineField(value);
 
       sections.forEach((section) => {
-        if (!uniqueFields.includes(section[field])) {
+        let val = section[field];
+        if (section["Section"] === "overall" && value === "year") {
+          val = 1900;
+        }
+
+        if (!uniqueFields.includes(val)) {
           count++;
-          uniqueFields.push(section[field]);
+          uniqueFields.push(val);
         }
       });
 
@@ -199,7 +204,12 @@ export default class ReformattedDataset {
       let field = this.determineField(value);
       let total = new Decimal(0);
       sections.forEach((section) => {
-          total = Decimal.add(total, new Decimal(section[field]));
+        let val = new Decimal(section[field]);
+
+        if (section["Section"] === "overall" && value === "year") {
+          val = new Decimal(1900);
+        }
+        total = Decimal.add(total, val);
       });
 
       let avg = total.toNumber() / sections.length;
@@ -208,10 +218,14 @@ export default class ReformattedDataset {
 
     private calculateSum(sections: any[], value: any): number {
       let field = this.determineField(value);
-      let sum = 0;
+      let sum = new Decimal(0);
 
       sections.forEach((section) => {
-        sum += section[field];
+        let val = new Decimal(section[field]);
+        if (section["Section"] === "overall" && value === "year") {
+          val = new Decimal(1900);
+        }
+        sum = Decimal.add(sum, val);
       });
 
       return Number(sum.toFixed(2));
@@ -222,8 +236,12 @@ export default class ReformattedDataset {
       let max = Number.MIN_VALUE;
 
       sections.forEach((section) => {
-        if (section[field] > max) {
-          max = section[field];
+        let val = section[field];
+        if (section["Section"] === "overall" && value === "year") {
+          val = 1900;
+        }
+        if (val > max) {
+          max = val;
         }
       });
 
@@ -235,8 +253,12 @@ export default class ReformattedDataset {
       let min = Number.MAX_VALUE;
 
       sections.forEach((section) => {
-        if (section[field] < min) {
-          min = section[field];
+        let val = section[field];
+        if (section["Section"] === "overall" && value === "year") {
+          val = 1900;
+        }
+        if (val < min) {
+          min = val;
         }
       });
 

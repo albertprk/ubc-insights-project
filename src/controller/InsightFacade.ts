@@ -239,7 +239,9 @@ export default class InsightFacade implements IInsightFacade {
               return result;
             }
 
+            Log.info("about to reformat");
             result = reformattedDataset.reformatSections(result, query);
+            Log.info("REformatted");
 
             if (result.length > 5000) {
                 throw new ResultTooLargeError();

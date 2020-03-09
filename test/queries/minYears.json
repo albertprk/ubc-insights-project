@@ -1,0 +1,30 @@
+{
+    "title": "Min years",
+    "query": {
+  "WHERE": {},
+  "OPTIONS": {
+    "COLUMNS": [
+      "overallMin"
+    ],
+    "ORDER": {
+      "dir": "DOWN",
+      "keys": [
+        "overallMin"
+      ]
+    }
+  },
+  "TRANSFORMATIONS": {
+    "GROUP": [
+      "courses_dept"
+    ],
+    "APPLY": [
+      {
+        "overallMin": {
+          "MIN": "courses_year"
+        }
+      }
+    ]
+  }
+},
+    "isQueryValid": true,
+"result":[{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900},{"overallMin":1900}]}
