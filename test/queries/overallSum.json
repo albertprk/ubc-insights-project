@@ -1,0 +1,54 @@
+{
+    "title": "Finding the overall sum",
+    "query": {
+  "WHERE": {
+    "AND": [
+      {
+        "LT": {
+          "courses_avg": 88.1
+        }
+      },
+      {
+        "GT": {
+          "courses_avg": 88
+        }
+      },
+      {
+        "IS": {
+          "courses_dept": "*"
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_avg",
+      "courses_instructor",
+      "courses_dept",
+      "overallSum"
+    ],
+    "ORDER": {
+      "dir": "DOWN",
+      "keys": [
+        "courses_dept",
+        "overallSum"
+      ]
+    }
+  },
+  "TRANSFORMATIONS": {
+    "GROUP": [
+      "courses_dept",
+      "courses_instructor",
+      "courses_avg"
+    ],
+    "APPLY": [
+      {
+        "overallSum": {
+          "SUM": "courses_avg"
+        }
+      }
+    ]
+  }
+},
+    "isQueryValid": true,
+"result":[{"courses_avg":88.08,"courses_instructor":"","courses_dept":"zool","overallSum":88.08},{"courses_avg":88.09,"courses_instructor":"zamar, ruben","courses_dept":"stat","overallSum":88.09},{"courses_avg":88.09,"courses_instructor":"","courses_dept":"stat","overallSum":88.09},{"courses_avg":88.06,"courses_instructor":"","courses_dept":"spph","overallSum":176.12},{"courses_avg":88.09,"courses_instructor":"mcgrail, kimberlyn;mcleod, christopher;shoveller, jean","courses_dept":"spph","overallSum":88.09},{"courses_avg":88.04,"courses_instructor":"","courses_dept":"sowk","overallSum":176.08},{"courses_avg":88.04,"courses_instructor":"wright, margaret","courses_dept":"sowk","overallSum":88.04},{"courses_avg":88.03,"courses_instructor":"jones, elizabeth","courses_dept":"sowk","overallSum":88.03},{"courses_avg":88.03,"courses_instructor":"","courses_dept":"sowk","overallSum":88.03},{"courses_avg":88.02,"courses_instructor":"","courses_dept":"rsot","overallSum":176.04},{"courses_avg":88.07,"courses_instructor":"beasley, larry","courses_dept":"plan","overallSum":88.07},{"courses_avg":88.07,"courses_instructor":"","courses_dept":"plan","overallSum":88.07},{"courses_avg":88.07,"courses_instructor":"morrissey, david","courses_dept":"phys","overallSum":88.07},{"courses_avg":88.07,"courses_instructor":"","courses_dept":"phys","overallSum":88.07},{"courses_avg":88.05,"courses_instructor":"milner, valery","courses_dept":"phys","overallSum":88.05},{"courses_avg":88.06,"courses_instructor":"","courses_dept":"phth","overallSum":352.24},{"courses_avg":88.08,"courses_instructor":"","courses_dept":"phth","overallSum":176.16},{"courses_avg":88.09,"courses_instructor":"klassen, tara","courses_dept":"phth","overallSum":88.09},{"courses_avg":88.09,"courses_instructor":"","courses_dept":"phth","overallSum":88.09},{"courses_avg":88.09,"courses_instructor":"nicholl, tessa","courses_dept":"phar","overallSum":88.09},{"courses_avg":88.01,"courses_instructor":"","courses_dept":"phar","overallSum":88.01},{"courses_avg":88.03,"courses_instructor":"","courses_dept":"nurs","overallSum":176.06},{"courses_avg":88.07,"courses_instructor":"wong, sabrina","courses_dept":"nurs","overallSum":88.07},{"courses_avg":88.07,"courses_instructor":"macphee, maura","courses_dept":"nurs","overallSum":88.07},{"courses_avg":88.07,"courses_instructor":"","courses_dept":"nurs","overallSum":88.07},{"courses_avg":88.06,"courses_instructor":"macphee, maura","courses_dept":"nurs","overallSum":88.06},{"courses_avg":88.06,"courses_instructor":"","courses_dept":"nurs","overallSum":88.06},{"courses_avg":88.03,"courses_instructor":"brown, helen jean","courses_dept":"nurs","overallSum":88.03},{"courses_avg":88.03,"courses_instructor":"rodney, patricia","courses_dept":"nurs","overallSum":88.03},{"courses_avg":88.04,"courses_instructor":"","courses_dept":"musc","overallSum":88.04},{"courses_avg":88.08,"courses_instructor":"","courses_dept":"mine","overallSum":88.08},{"courses_avg":88.06,"courses_instructor":"morin, gregg","courses_dept":"medg","overallSum":88.06},{"courses_avg":88.06,"courses_instructor":"","courses_dept":"medg","overallSum":88.06},{"courses_avg":88.06,"courses_instructor":"bournot-trites, monique","courses_dept":"lled","overallSum":88.06},{"courses_avg":88.06,"courses_instructor":"","courses_dept":"lled","overallSum":88.06},{"courses_avg":88.06,"courses_instructor":"absar, rafa","courses_dept":"libr","overallSum":88.06},{"courses_avg":88.06,"courses_instructor":"","courses_dept":"libr","overallSum":88.06},{"courses_avg":88.03,"courses_instructor":"broadley, louise;olsen, anne","courses_dept":"libr","overallSum":88.03},{"courses_avg":88.01,"courses_instructor":"","courses_dept":"kin","overallSum":176.02},{"courses_avg":88.04,"courses_instructor":"ganzenmueller, petra","courses_dept":"germ","overallSum":88.04},{"courses_avg":88.09,"courses_instructor":"tba","courses_dept":"fipr","overallSum":88.09},{"courses_avg":88.09,"courses_instructor":"","courses_dept":"fipr","overallSum":88.09},{"courses_avg":88.05,"courses_instructor":"scholte, tom","courses_dept":"fipr","overallSum":88.05},{"courses_avg":88.05,"courses_instructor":"","courses_dept":"fipr","overallSum":88.05},{"courses_avg":88.09,"courses_instructor":"","courses_dept":"etec","overallSum":88.09},{"courses_avg":88.06,"courses_instructor":"tba","courses_dept":"etec","overallSum":88.06},{"courses_avg":88.05,"courses_instructor":"","courses_dept":"epse","overallSum":88.05},{"courses_avg":88.04,"courses_instructor":"","courses_dept":"epse","overallSum":88.04},{"courses_avg":88.03,"courses_instructor":"macneil, kimberley","courses_dept":"epse","overallSum":88.03},{"courses_avg":88.08,"courses_instructor":"harris, sara","courses_dept":"eosc","overallSum":88.08},{"courses_avg":88.08,"courses_instructor":"ruitenberg, claudia","courses_dept":"edst","overallSum":88.08},{"courses_avg":88.08,"courses_instructor":"","courses_dept":"edst","overallSum":88.08},{"courses_avg":88.07,"courses_instructor":"","courses_dept":"edst","overallSum":88.07},{"courses_avg":88.05,"courses_instructor":"walter, pierre","courses_dept":"edst","overallSum":88.05},{"courses_avg":88.05,"courses_instructor":"","courses_dept":"edst","overallSum":88.05},{"courses_avg":88.06,"courses_instructor":"de cosson, alexander","courses_dept":"edcp","overallSum":88.06},{"courses_avg":88.06,"courses_instructor":"","courses_dept":"edcp","overallSum":88.06},{"courses_avg":88.09,"courses_instructor":"gallipoli, giovanni","courses_dept":"econ","overallSum":88.09},{"courses_avg":88.09,"courses_instructor":"","courses_dept":"econ","overallSum":88.09},{"courses_avg":88.08,"courses_instructor":"","courses_dept":"dent","overallSum":176.16},{"courses_avg":88.06,"courses_instructor":"marshall, janet vaughan","courses_dept":"cnps","overallSum":88.06},{"courses_avg":88.05,"courses_instructor":"yeung, paul","courses_dept":"cnps","overallSum":88.05},{"courses_avg":88.05,"courses_instructor":"","courses_dept":"cnps","overallSum":88.05},{"courses_avg":88.06,"courses_instructor":"lim, clark","courses_dept":"civl","overallSum":88.06},{"courses_avg":88.06,"courses_instructor":"","courses_dept":"civl","overallSum":88.06},{"courses_avg":88.09,"courses_instructor":"allan, douglas;bamji, shernaz;loewen, christopher","courses_dept":"cell","overallSum":88.09},{"courses_avg":88.09,"courses_instructor":"","courses_dept":"cell","overallSum":88.09},{"courses_avg":88.04,"courses_instructor":"jaggi, bruno","courses_dept":"bmeg","overallSum":88.04},{"courses_avg":88.04,"courses_instructor":"","courses_dept":"bmeg","overallSum":88.04},{"courses_avg":88.09,"courses_instructor":"bohlmann, jorg","courses_dept":"biol","overallSum":88.09},{"courses_avg":88.09,"courses_instructor":"","courses_dept":"biol","overallSum":88.09},{"courses_avg":88.07,"courses_instructor":"cohen freue, gabriela","courses_dept":"biof","overallSum":88.07},{"courses_avg":88.07,"courses_instructor":"","courses_dept":"biof","overallSum":88.07},{"courses_avg":88.08,"courses_instructor":"cullis, pieter;finlay, b brett","courses_dept":"bioc","overallSum":88.08},{"courses_avg":88.08,"courses_instructor":"","courses_dept":"bioc","overallSum":88.08},{"courses_avg":88.09,"courses_instructor":"","courses_dept":"audi","overallSum":88.09},{"courses_avg":88.04,"courses_instructor":"small, jeff alan","courses_dept":"audi","overallSum":88.04},{"courses_avg":88.04,"courses_instructor":"","courses_dept":"audi","overallSum":88.04},{"courses_avg":88.03,"courses_instructor":"noland, andrea;rammage, linda","courses_dept":"audi","overallSum":88.03},{"courses_avg":88.03,"courses_instructor":"","courses_dept":"audi","overallSum":88.03},{"courses_avg":88.08,"courses_instructor":"marini, francesca;schmidlin, rick","courses_dept":"arst","overallSum":88.08},{"courses_avg":88.08,"courses_instructor":"","courses_dept":"arst","overallSum":88.08},{"courses_avg":88.07,"courses_instructor":"wassink, berend","courses_dept":"apsc","overallSum":88.07},{"courses_avg":88.03,"courses_instructor":"bishundayal, deonarine","courses_dept":"adhe","overallSum":176.06}]}

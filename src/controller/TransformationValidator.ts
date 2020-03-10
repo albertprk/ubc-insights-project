@@ -1,5 +1,6 @@
 import Log from "../Util";
 import QueryValidator from "./QueryValidator";
+import Constants from "./Constants";
 
 export default class ValidateTransformations {
 
@@ -10,32 +11,6 @@ export default class ValidateTransformations {
     private static APPLY_TOKENS: string[] = ["MAX", "MIN", "AVG", "COUNT", "SUM"];
     private static NUMERIC_KEYS: string[] = ["lat", "lon", "seats", "avg", "pass",
     "fail", "audit", "year"];
-
-    public static MFIELD_MAP: Record<string, string> = {
-        avg: "Avg",
-        pass: "Pass",
-        fail: "Fail",
-        audit: "Audit",
-        year: "Year",
-        lat: "lat",
-        lon: "lon"
-    };
-
-    public static SFIELD_MAP: Record<string, string> = {
-        dept: "Subject",
-        id: "Course",
-        instructor: "Professor",
-        title: "Title",
-        uuid: "id",
-        fullname: "fullname",
-        shortname: "shortname",
-        number: "number",
-        name: "name",
-        address: "address",
-        type: "type",
-        furniture: "furniture",
-        href: "href"
-    };
 
     public static getTransformationValues(query: any): string[] {
         let result: string[] = this.transformTransformationValues(query["GROUP"]);
@@ -55,10 +30,10 @@ export default class ValidateTransformations {
             const index = val.indexOf("_");
             const rule = val.substring(index + 1, val.length);
 
-            if (typeof this.SFIELD_MAP[rule] !== "undefined") {
-                result.push(this.SFIELD_MAP[rule]);
+            if (typeof Constants.SFIELD_MAP[rule] !== "undefined") {
+                result.push(Constants.SFIELD_MAP[rule]);
             } else {
-                result.push(this.MFIELD_MAP[rule]);
+                result.push(Constants.MFIELD_MAP[rule]);
             }
         });
 

@@ -1,0 +1,30 @@
+{
+    "title": "Count years",
+    "query": {
+  "WHERE": {},
+  "OPTIONS": {
+    "COLUMNS": [
+      "overallMin"
+    ],
+    "ORDER": {
+      "dir": "DOWN",
+      "keys": [
+        "overallMin"
+      ]
+    }
+  },
+  "TRANSFORMATIONS": {
+    "GROUP": [
+      "courses_dept"
+    ],
+    "APPLY": [
+      {
+        "overallMin": {
+          "AVG": "courses_year"
+        }
+      }
+    ]
+  }
+},
+    "isQueryValid": true,
+"result":[{"overallMin":2012.87},{"overallMin":2003.25},{"overallMin":1997.5},{"overallMin":1996.32},{"overallMin":1991.47},{"overallMin":1987.71},{"overallMin":1986.79},{"overallMin":1985.11},{"overallMin":1984.32},{"overallMin":1983.84},{"overallMin":1980.53},{"overallMin":1980.3},{"overallMin":1980.12},{"overallMin":1979.46},{"overallMin":1978.23},{"overallMin":1977.8},{"overallMin":1977.75},{"overallMin":1977.74},{"overallMin":1977.43},{"overallMin":1977.27},{"overallMin":1977.13},{"overallMin":1976.48},{"overallMin":1976.24},{"overallMin":1975.71},{"overallMin":1975.61},{"overallMin":1975.48},{"overallMin":1975.41},{"overallMin":1975.34},{"overallMin":1975.06},{"overallMin":1974.66},{"overallMin":1974.53},{"overallMin":1973.98},{"overallMin":1973.54},{"overallMin":1973.21},{"overallMin":1972.82},{"overallMin":1972.21},{"overallMin":1971.75},{"overallMin":1970.56},{"overallMin":1970.37},{"overallMin":1969.28},{"overallMin":1969},{"overallMin":1968.98},{"overallMin":1968.81},{"overallMin":1968.48},{"overallMin":1968.33},{"overallMin":1967.27},{"overallMin":1967.18},{"overallMin":1967.03},{"overallMin":1966.76},{"overallMin":1966.59},{"overallMin":1966.46},{"overallMin":1966.01},{"overallMin":1965.85},{"overallMin":1965.5},{"overallMin":1965.45},{"overallMin":1965.39},{"overallMin":1965.36},{"overallMin":1964.77},{"overallMin":1964.49},{"overallMin":1964.44},{"overallMin":1964.39},{"overallMin":1964.31},{"overallMin":1964},{"overallMin":1963.89},{"overallMin":1963.81},{"overallMin":1963.8},{"overallMin":1963.49},{"overallMin":1963.44},{"overallMin":1963.4},{"overallMin":1963.33},{"overallMin":1963.29},{"overallMin":1962.81},{"overallMin":1962.73},{"overallMin":1962.53},{"overallMin":1962.44},{"overallMin":1962.41},{"overallMin":1962.35},{"overallMin":1962.12},{"overallMin":1962.11},{"overallMin":1962.02},{"overallMin":1961.67},{"overallMin":1961.39},{"overallMin":1961.22},{"overallMin":1960.96},{"overallMin":1960.68},{"overallMin":1960.66},{"overallMin":1960.43},{"overallMin":1960.38},{"overallMin":1960.02},{"overallMin":1959.94},{"overallMin":1959.91},{"overallMin":1959.84},{"overallMin":1959.71},{"overallMin":1959.52},{"overallMin":1959.51},{"overallMin":1959.41},{"overallMin":1959.06},{"overallMin":1959.05},{"overallMin":1959},{"overallMin":1958.95},{"overallMin":1958.95},{"overallMin":1958.84},{"overallMin":1958.81},{"overallMin":1958.79},{"overallMin":1958.73},{"overallMin":1958.57},{"overallMin":1958.31},{"overallMin":1958.27},{"overallMin":1958.17},{"overallMin":1957.79},{"overallMin":1957.79},{"overallMin":1957.75},{"overallMin":1957.65},{"overallMin":1957.63},{"overallMin":1957.58},{"overallMin":1957.55},{"overallMin":1957.5},{"overallMin":1957.5},{"overallMin":1957.5},{"overallMin":1957.5},{"overallMin":1957.5},{"overallMin":1957.5},{"overallMin":1957.41},{"overallMin":1957.38},{"overallMin":1957.36},{"overallMin":1957.36},{"overallMin":1957.33},{"overallMin":1957.25},{"overallMin":1957.25},{"overallMin":1957.25},{"overallMin":1957.24},{"overallMin":1957.19},{"overallMin":1957.19},{"overallMin":1957.19},{"overallMin":1957.14},{"overallMin":1957.08},{"overallMin":1957.01},{"overallMin":1957},{"overallMin":1956.9},{"overallMin":1956.88},{"overallMin":1956.84},{"overallMin":1956.82},{"overallMin":1956.77},{"overallMin":1956.75},{"overallMin":1956.67},{"overallMin":1956.61},{"overallMin":1956.55},{"overallMin":1956.52},{"overallMin":1956.48},{"overallMin":1956.43},{"overallMin":1956.42},{"overallMin":1956.39},{"overallMin":1956.32},{"overallMin":1956.32},{"overallMin":1956.17},{"overallMin":1956.15},{"overallMin":1956.05},{"overallMin":1956},{"overallMin":1955.9},{"overallMin":1955.9},{"overallMin":1955.89},{"overallMin":1955.87},{"overallMin":1955.86},{"overallMin":1955.8},{"overallMin":1955.79},{"overallMin":1955.75},{"overallMin":1955.75},{"overallMin":1955.72},{"overallMin":1955.72},{"overallMin":1955.72},{"overallMin":1955.71},{"overallMin":1955.7},{"overallMin":1955.7},{"overallMin":1955.65},{"overallMin":1955.63},{"overallMin":1955.6},{"overallMin":1955.6},{"overallMin":1955.5},{"overallMin":1955.5},{"overallMin":1955.28},{"overallMin":1954.81},{"overallMin":1954.66},{"overallMin":1954.37},{"overallMin":1953.97},{"overallMin":1953.7},{"overallMin":1953.52},{"overallMin":1953.13},{"overallMin":1923},{"overallMin":1900}]}

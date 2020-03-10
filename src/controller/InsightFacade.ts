@@ -1,14 +1,9 @@
 import Log from "../Util";
 import * as fs from "fs";
+import * as parse5 from "parse5";
 import * as path from "path";
-import {
-    IInsightFacade,
-    InsightDataset,
-    InsightDatasetKind,
-    InsightError,
-    NotFoundError,
-    ResultTooLargeError
-} from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError,
+    NotFoundError, ResultTooLargeError} from "./IInsightFacade";
 import QueryValidator from "./QueryValidator";
 import ParsingTree from "./ParsingTree";
 import ReformattedDataset from "./ReformattedDataset";
@@ -38,39 +33,25 @@ export default class InsightFacade implements IInsightFacade {
         }
 
         this.datasets = new Map();
-        /*
-        this.loadDatasetsFromMemory().then((result) => {
-          Log.trace("InsightFacadeImpl::init()");
-        }).catch((err) => {
-          Log.error(err);
-        });
-        */
+        Log.trace("InsightFacadeImpl::init()");
     }
 
-    private loadDatasetsFromMemory(): Promise<string[][]> {
-        /*
-        const allFiles = fs.readdirSync(this.dataFolder);
-        let promises: Array<Promise<string[]>> = [];
-        allFiles.forEach((file) => {
-            const content = fs.readFileSync(
-                path.join(this.dataFolder, "/", file),
-            );
+    private loadDatasetFromMemory(filePath: string, id: string): Promise<string[][]> {
+      return new Promise((resolve, reject) => {
+          let promises: Array<Promise<string[]>> = [];
+          const content = fs.readFileSync(filePath);
 
-            this.findKind(content).then((kind) => {
-                const index: number = file.indexOf(".zip");
-                let zipProcessor: ZipProcessor = new ZipProcessor(file.substring(0, index),
-                    content.toString("base64"), kind);
-                promises.push(
-                    zipProcessor.processZipContent(true)
-              );
-            });
-        });
+          this.findKind(content).then((kind) => {
 
-        return new Promise((resolve, reject) => {
-            resolve(Promise.all(promises));
-        });
-        */
-        return null;
+          if (kind === InsightDatasetKind.Courses) {
+            promises.push(this.returnCourses(id, content.toString("base64"), kind));
+          } else {
+            promises.push(this.returnRooms(id, content.toString("base64"), kind));
+          }
+
+          resolve(Promise.all(promises));
+          });
+      });
     }
 
     private findKind(content: Buffer): Promise<InsightDatasetKind> {
@@ -118,7 +99,7 @@ export default class InsightFacade implements IInsightFacade {
         let filePath: string = path.join(this.dataFolder, "/" + id + ".zip");
         if (fs.existsSync(filePath)) {
             return new Promise((resolve, reject) => {
-                reject(new InsightError("Error: Already exists"));
+                reject(new InsightError("Error: " + id + " already exists"));
             });
         }
         if (typeof this.datasets.get(id) === "undefined" && !fs.existsSync(filePath)) {
@@ -146,6 +127,9 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((resolve, reject) => {
             zipProcessor.processZipContent(false)
                 .then((data: Dataset) => {
+                    if (data.sections.length === 0) {
+                      reject(new InsightError("Error: No valid files"));
+                    }
                     this.datasets.set(id, data);
                     resolve(Array.from(this.datasets.keys()));
                 }).catch((err: any) => {
@@ -159,17 +143,29 @@ export default class InsightFacade implements IInsightFacade {
     private returnRooms(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         let zipProcessor = new ZipProcessor(id, content, kind);
         return new Promise((resolve, reject) => {
-            zipProcessor.processRoomsZipContent()
-                .then((result: any) => {
-                    this.datasets.set(id, result);
-                    resolve(Array.from(this.datasets.keys()));
-                }).catch((err) => {
-                    reject(
-                        new InsightError(
-                            "Error: Problem processing the data zip. Ensure the content given" +
-                            "is a valid ZIP file.")
-                    );
-                });
+          let zipFile: JSZip = new JSZip();
+          let dataset = new Dataset(id, kind);
+          zipFile.loadAsync(content, {base64: true}).then((files) => {
+              return files.folder("rooms").file("index.htm").async("text");
+          }).then((html) => {
+              let parsedHTML = parse5.parse(html);
+              let htmlTable = zipProcessor.findTable(parsedHTML);
+              zipProcessor.createIndexTable(htmlTable["childNodes"]);
+              return zipProcessor.getLatAndLong();
+              return htmlTable;
+          }).catch((llErr) => {
+              Log.trace("Unable to get Lat and Long");
+              Log.trace(llErr);
+              return zipProcessor.getRooms();
+          }).then((result) => {
+              Log.info("getting rooms");
+              return zipProcessor.getRooms();
+          }).then((data) => {
+              this.datasets.set(id, data);
+              resolve(Array.from(this.datasets.keys()));
+          }).catch((err) => {
+              reject(err);
+          });
         });
     }
 
@@ -205,17 +201,22 @@ export default class InsightFacade implements IInsightFacade {
             } else if (typeof this.datasets.get(dataSetName) === "undefined" &&
                 !fs.existsSync(filePath)) {
                   reject(new InsightError("Unable to find dataset"));
-            }
-
-            try {
-                Log.info("ABOUT TO FIND QUERY RESULTS");
-                const result: any[] = this.findQueryResults(query, dataSetName);
-                Log.info("GOT QUERY RESULTS");
-                resolve(result);
-            } catch {
+            } else if (typeof this.datasets.get(dataSetName) === "undefined") {
+              this.loadDatasetFromMemory(filePath, dataSetName).then((loaded) => {
+                return this.findQueryResults(query, dataSetName);
+              }).then((results) => {
+                resolve(results);
+              }).catch((err) => {
                 reject(new ResultTooLargeError());
-            }
-
+              });
+            } else {
+              try {
+                  const result: any[] = this.findQueryResults(query, dataSetName);
+                  resolve(result);
+              } catch {
+                  reject(new ResultTooLargeError());
+              }
+          }
         });
     }
 
@@ -224,24 +225,26 @@ export default class InsightFacade implements IInsightFacade {
             let parsingTree: ParsingTree = new ParsingTree();
             let reformattedDataset: ReformattedDataset = new ReformattedDataset();
             const tree: TreeNode = parsingTree.createTreeNode(query["WHERE"]);
+
             let result: any[] = parsingTree.searchSections(
                 this.datasets.get(dataSetName),  tree
             );
 
             if (result.length > 5000 && typeof query["TRANSFORMATIONS"] === "undefined") {
                 throw new ResultTooLargeError();
+            } else if (result.length === 0) {
+              return result;
             }
 
-            Log.info("SEARCHED SECTIONS");
+            Log.info("about to reformat");
             result = reformattedDataset.reformatSections(result, query);
+            Log.info("REformatted");
 
             if (result.length > 5000) {
                 throw new ResultTooLargeError();
             }
 
-            Log.info("REFORMATTED SECTIONS");
             result = reformattedDataset.sortSections(result, query);
-            Log.info("SORTED SECTIONS");
             return result;
         } catch (err) {
             Log.trace(err);

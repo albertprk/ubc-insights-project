@@ -1,0 +1,30 @@
+{
+    "title": "Total years",
+    "query": {
+  "WHERE": {},
+  "OPTIONS": {
+    "COLUMNS": [
+      "overallMin"
+    ],
+    "ORDER": {
+      "dir": "DOWN",
+      "keys": [
+        "overallMin"
+      ]
+    }
+  },
+  "TRANSFORMATIONS": {
+    "GROUP": [
+      "courses_dept"
+    ],
+    "APPLY": [
+      {
+        "overallMin": {
+          "SUM": "courses_year"
+        }
+      }
+    ]
+  }
+},
+    "isQueryValid": true,
+"result":[{"overallMin":7096137},{"overallMin":5480592},{"overallMin":4413158},{"overallMin":4236183},{"overallMin":4013800},{"overallMin":3333024},{"overallMin":3237475},{"overallMin":2765857},{"overallMin":2516969},{"overallMin":2477160},{"overallMin":2426913},{"overallMin":2184828},{"overallMin":2183614},{"overallMin":2162363},{"overallMin":2145730},{"overallMin":2028781},{"overallMin":1980289},{"overallMin":1921530},{"overallMin":1910974},{"overallMin":1801588},{"overallMin":1788504},{"overallMin":1782649},{"overallMin":1670287},{"overallMin":1650552},{"overallMin":1584535},{"overallMin":1567067},{"overallMin":1508826},{"overallMin":1421755},{"overallMin":1373729},{"overallMin":1363604},{"overallMin":1347583},{"overallMin":1304416},{"overallMin":1303331},{"overallMin":1230960},{"overallMin":1212730},{"overallMin":1199032},{"overallMin":1183048},{"overallMin":1106715},{"overallMin":1052588},{"overallMin":1043093},{"overallMin":1033967},{"overallMin":1020651},{"overallMin":980647},{"overallMin":969108},{"overallMin":965577},{"overallMin":936376},{"overallMin":932917},{"overallMin":909824},{"overallMin":828591},{"overallMin":817519},{"overallMin":758682},{"overallMin":737722},{"overallMin":729905},{"overallMin":680592},{"overallMin":676730},{"overallMin":673461},{"overallMin":663045},{"overallMin":661283},{"overallMin":642784},{"overallMin":633801},{"overallMin":630179},{"overallMin":621941},{"overallMin":617250},{"overallMin":580757},{"overallMin":569593},{"overallMin":546329},{"overallMin":530225},{"overallMin":511431},{"overallMin":490993},{"overallMin":484964},{"overallMin":459430},{"overallMin":424544},{"overallMin":413451},{"overallMin":411108},{"overallMin":404011},{"overallMin":391530},{"overallMin":370963},{"overallMin":370261},{"overallMin":369430},{"overallMin":363131},{"overallMin":346023},{"overallMin":344207},{"overallMin":342792},{"overallMin":325885},{"overallMin":322622},{"overallMin":320961},{"overallMin":320767},{"overallMin":316174},{"overallMin":305899},{"overallMin":295038},{"overallMin":291508},{"overallMin":288603},{"overallMin":287665},{"overallMin":285731},{"overallMin":285535},{"overallMin":283815},{"overallMin":281607},{"overallMin":280455},{"overallMin":270193},{"overallMin":257527},{"overallMin":246634},{"overallMin":239662},{"overallMin":238734},{"overallMin":211953},{"overallMin":211382},{"overallMin":203610},{"overallMin":193762},{"overallMin":191693},{"overallMin":176941},{"overallMin":175991},{"overallMin":172063},{"overallMin":170469},{"overallMin":168415},{"overallMin":165183},{"overallMin":162735},{"overallMin":160696},{"overallMin":150520},{"overallMin":149066},{"overallMin":138929},{"overallMin":137000},{"overallMin":133424},{"overallMin":125219},{"overallMin":123047},{"overallMin":110235},{"overallMin":109579},{"overallMin":105970},{"overallMin":102066},{"overallMin":101921},{"overallMin":97826},{"overallMin":96480},{"overallMin":96037},{"overallMin":95764},{"overallMin":93085},{"overallMin":92165},{"overallMin":86476},{"overallMin":86059},{"overallMin":84273},{"overallMin":82194},{"overallMin":78228},{"overallMin":74340},{"overallMin":70715},{"overallMin":68719},{"overallMin":62584},{"overallMin":62580},{"overallMin":60573},{"overallMin":58685},{"overallMin":58668},{"overallMin":54806},{"overallMin":54777},{"overallMin":54760},{"overallMin":53010},{"overallMin":52750},{"overallMin":50887},{"overallMin":50847},{"overallMin":46982},{"overallMin":44931},{"overallMin":43029},{"overallMin":39950},{"overallMin":39151},{"overallMin":39118},{"overallMin":39116},{"overallMin":39114},{"overallMin":35350},{"overallMin":35232},{"overallMin":35203},{"overallMin":35199},{"overallMin":33567},{"overallMin":33304},{"overallMin":33303},{"overallMin":31399},{"overallMin":31316},{"overallMin":31316},{"overallMin":31292},{"overallMin":27403},{"overallMin":27384},{"overallMin":23480},{"overallMin":21590},{"overallMin":15661},{"overallMin":11745},{"overallMin":9845},{"overallMin":9615},{"overallMin":7831},{"overallMin":7830},{"overallMin":7830},{"overallMin":7830},{"overallMin":7829},{"overallMin":3915},{"overallMin":3915},{"overallMin":1900}]}
