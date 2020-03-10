@@ -79,9 +79,6 @@ export default class InsightFacade implements IInsightFacade {
       });
     }
 
-    // If it's an invalid dataset then JSZip will throw an error
-    // Todo: Check to see if there's at least one valid course section
-    // Todo: Skip over invalid file
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         if (id === null || typeof id === "undefined" || content === null ||
             typeof content === "undefined" || kind === null || typeof kind === "undefined") {
@@ -128,7 +125,7 @@ export default class InsightFacade implements IInsightFacade {
     private returnCourses(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         let zipProcessor = new ZipProcessor(id, content, kind);
         return new Promise((resolve, reject) => {
-            zipProcessor.processZipContent()
+            zipProcessor.processZipContent(false)
                 .then((data: Dataset) => {
                     if (data.sections.length === 0) {
                       reject(new InsightError("Error: No valid files"));

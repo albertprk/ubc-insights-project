@@ -11,7 +11,7 @@ export default class Building {
     public constructor() {
       Log.trace("Building::init()");
     }
-
+  
     public static dealWithRoomCell(obj: any, cell: any): void {
       if (cell["attrs"].length === 0 || cell["childNodes"].length === 0) {
         return;
@@ -56,7 +56,6 @@ export default class Building {
             type = c["value"].trim();
           }
         });
-
         obj["type"] = type;
       }
     }
