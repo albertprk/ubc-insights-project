@@ -7,11 +7,10 @@ import * as http from "http";
 import ZipProcessor from "./ZipProcessor";
 
 export default class Building {
-
     public constructor() {
       Log.trace("Building::init()");
     }
-  
+
     public static dealWithRoomCell(obj: any, cell: any): void {
       if (cell["attrs"].length === 0 || cell["childNodes"].length === 0) {
         return;

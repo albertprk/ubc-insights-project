@@ -52,6 +52,7 @@ class CourseQueryProcessor {
     }
 
     getCourseConditions(controlFields) {
+        let conditions = {};
         const conditionTypes = ["courses-conditiontype-all", "courses-conditiontype-any", "courses-conditiontype-none"];
         let condition = "";
         for (let conditionType of conditionTypes) {
@@ -59,5 +60,19 @@ class CourseQueryProcessor {
                 condition = conditionType;
             }
         }
+        switch(condition) {
+            case "courses-conditiontype-all":
+                conditions["AND"] = {};
+                break;
+            case "courses-conditiontype-any":
+                conditions["OR"] = {};
+                break;
+            case "courses-conditiontype-none":
+                conditions["NOT"] = {"OR": {}};
+                break;
+            default:
+                console.log("error");
+        }
+        console.log(conditions);
     }
 }
