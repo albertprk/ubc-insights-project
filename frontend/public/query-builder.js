@@ -8,12 +8,13 @@
 
 CampusExplorer.buildQuery = function() {
     let query = {};
-    let processor = new CourseQueryProcessor();
+    let courseProcessor = new CourseQueryProcessor();
+    let roomsProcessor = new RoomsQueryProcessor();
     let activeTab = document.getElementsByClassName("tab-panel active");
     if (typeof activeTab.namedItem("tab-courses") !== "undefined") {
-        query = processor.processCourses(activeTab);
+        query = courseProcessor.processCourses(activeTab);
     } else {
-        query = processor.processRooms(activeTab);
+        query = roomsProcessor.processRooms(activeTab);
     }
     return query;
 };
@@ -73,6 +74,38 @@ class CourseQueryProcessor {
             default:
                 console.log("error");
         }
+        this.getControlGroupConditions(conditions);
         console.log(conditions);
+    }
+
+    getControlGroupConditions(conditions) {
+        let cgConditions = {};
+        const values = ["audit", "avg", "selected", "fail", "id", "instructor", "pass", "title", "uuid", "year"];
+        const operators = ["EQ", "GT", "IS", "LT"];
+        let selectedValue = "";
+        for (let curr = 0; curr < document.getElementsByClassName("control-group condition").length; curr++) {
+            let not = false;
+            // let notCheckBox = document.getElement;
+            let currContainer = document.getElementsByClassName("control-group condition")[curr];
+            console.log(currContainer);
+            for (let value of values) {
+                let currentColl = currContainer.item(value);
+                console.log(currentColl);
+                if (currentColl.item(value).selected) {
+                    selectedValue = "courses_" + value;
+                }
+            }
+            console.log(selectedValue);
+            for (let operator of operators) {
+
+            }
+        }
+    }
+}
+
+class RoomsQueryProcessor {
+    constructor() {
+        console.log("Course processor created");
+        this.query = {"WHERE": {}, "OPTIONS": {"COLUMNS": {}, "ORDER": ""}};
     }
 }
