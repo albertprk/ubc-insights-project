@@ -8,33 +8,112 @@
 
 CampusExplorer.buildQuery = function() {
     let query = {};
-    let courseProcessor = new CourseQueryProcessor();
-    let roomsProcessor = new RoomsQueryProcessor();
     let activeTab = document.getElementsByClassName("tab-panel active");
     if (typeof activeTab.namedItem("tab-courses") !== "undefined") {
-        query = courseProcessor.processCourses(activeTab);
+        let courseProcessor = new queryProcessor("courses");
+        query = courseProcessor.processQuery(activeTab);
     } else {
-        query = roomsProcessor.processRooms(activeTab);
+        let roomsProcessor = new queryProcessor("rooms");
+        query = roomsProcessor.processQuery(activeTab);
     }
     return query;
 };
 
-class CourseQueryProcessor {
-    constructor() {
-        console.log("Course processor created");
+class queryProcessor {
+    constructor(queryType) {
         this.query = {"WHERE": {}, "OPTIONS": {"COLUMNS": {}, "ORDER": ""}};
+        this.queryType = queryType;
     }
 
-    processCourses(activeTab) {
+    processQuery(activeTab, preString) {
         this.query["WHERE"] = this.getCourseConditions(activeTab);
         this.query["OPTIONS"]["COLUMNS"] = this.getCourseColumns(activeTab);
+        this.query["OPTIONS"]["ORDER"] = this.getCourseOrder(activeTab);
         console.log(this.query);
-        console.log(this.query["OPTIONS"]["COLUMNS"]);
+        return this.query;
     }
 
-    processRooms(controlFields) {
-        let audit = document.getElementById("courses-columns-field-audit").checked;
-        console.log(audit);
+    getCourseConditions(activeTab) {
+        let conditions = {};
+        const possibleConditionTypes = ["courses-conditiontype-all", "courses-conditiontype-any",
+                                        "courses-conditiontype-none"];
+        let selectedConditionType = "";
+        for (let possibleConditionType of possibleConditionTypes) {
+            if (document.getElementById(possibleConditionType).checked) {
+                selectedConditionType = possibleConditionType;
+            }
+        }
+        switch(selectedConditionType) {
+            case "courses-conditiontype-all":
+                if (this.findClass("conditions-container", activeTab[0]).childNodes.length > 1) {
+                    conditions["AND"] = {};
+                    conditions["AND"] = this.getSelectedConditions(activeTab, conditions);
+                } else {
+                    conditions = this.getSelectedConditions(activeTab, conditions)[0];
+                }
+                return conditions;
+            case "courses-conditiontype-any":
+                if (this.findClass("conditions-container", activeTab[0]).childNodes.length > 1) {
+                    conditions["OR"] = {};
+                    conditions["OR"] = this.getSelectedConditions(activeTab, conditions);
+                } else {
+                    conditions = this.getSelectedConditions(activeTab, conditions)[0];
+                }
+                return conditions;
+            case "courses-conditiontype-none":
+                if (this.findClass("conditions-container", activeTab[0]).childNodes.length > 1) {
+                    conditions["NOT"]["OR"] = {};
+                    conditions["NOT"]["OR"] = this.getSelectedConditions(activeTab, conditions);
+                } else {
+                    conditions["NOT"] = {};
+                    conditions["NOT"] = this.getSelectedConditions(activeTab, conditions)[0];
+                }
+                return conditions;
+            default:
+                console.log("error");
+        }
+        return conditions
+    }
+
+    getSelectedConditions(activeTab, conditions) {
+        let cgConditions = conditions;
+        let conditionsToAdd = [];
+        if (activeTab.length === 1) {
+            let conditions = this.findClass("conditions-container", activeTab[0]);
+            let conditionsList = conditions.childNodes;
+            for (let index = 0; index < conditionsList.length; index++) {
+                let conditionToAdd = {};
+                let field = {};
+                let fieldName = "";
+                let operator = "";
+                let curr = conditionsList[index];
+                let fields = this.findClass("control fields", curr).childNodes[1].childNodes;
+                for (let index = 0; index < fields.length; index++) {
+                    if (fields[index].selected) {
+                        fieldName = this.queryType + "_" + fields[index].value;
+                        field[fieldName] = this.findClass("control term", curr).childNodes[1].value;
+                    }
+                }
+                let operators = this.findClass("control operators", curr).childNodes[1].childNodes;
+                for (let index = 0; index < operators.length; index++) {
+                    if (operators[index].selected) {
+                        operator = operators[index].value;
+                    }
+                }
+                let controlNot = this.findClass("control not", curr);
+                if (controlNot.childNodes[1].checked) {
+                    conditionToAdd = {"NOT": {}};
+                    conditionToAdd["NOT"][operator] = field;
+                } else {
+                    conditionToAdd[operator] = field;
+                }
+                console.log(conditionToAdd);
+                conditionsToAdd.push(conditionToAdd);
+            }
+        } else {
+            console.log("Error: Active Tab object length > 1")
+        }
+        return conditionsToAdd;
     }
 
     getCourseColumns(controlFields) {
@@ -45,67 +124,40 @@ class CourseQueryProcessor {
             "courses-columns-field-year"];
         for (let field of fieldsList) {
             if (document.getElementById(field).checked) {
-                console.log(document.getElementById(field).value);
-                columns.push("courses_" + document.getElementById(field).value);
+                columns.push(this.queryType + "_" + document.getElementById(field).value);
             }
         }
         return columns;
     }
 
-    getCourseConditions(controlFields) {
-        let conditions = {};
-        const conditionTypes = ["courses-conditiontype-all", "courses-conditiontype-any", "courses-conditiontype-none"];
-        let condition = "";
-        for (let conditionType of conditionTypes) {
-            if (document.getElementById(conditionType).checked) {
-                condition = conditionType;
+    getCourseOrder(activeTab) {
+        let orderReturn = "";
+        let order = this.findClass("form-group order", activeTab[0]);
+        let order2 = this.findClass("control order fields", order);
+        let orderOptions = order2.childNodes[1].childNodes;
+        for (let index = 0; index < orderOptions.length; index++) {
+            if (orderOptions[index].selected) {
+                orderReturn = this.queryType + "_" + orderOptions[index].value;
             }
         }
-        switch(condition) {
-            case "courses-conditiontype-all":
-                conditions["AND"] = {};
-                break;
-            case "courses-conditiontype-any":
-                conditions["OR"] = {};
-                break;
-            case "courses-conditiontype-none":
-                conditions["NOT"] = {"OR": {}};
-                break;
-            default:
-                console.log("error");
-        }
-        this.getControlGroupConditions(conditions);
-        console.log(conditions);
+        return orderReturn;
     }
 
-    getControlGroupConditions(conditions) {
-        let cgConditions = {};
-        const values = ["audit", "avg", "selected", "fail", "id", "instructor", "pass", "title", "uuid", "year"];
-        const operators = ["EQ", "GT", "IS", "LT"];
-        let selectedValue = "";
-        for (let curr = 0; curr < document.getElementsByClassName("control-group condition").length; curr++) {
-            let not = false;
-            // let notCheckBox = document.getElement;
-            let currContainer = document.getElementsByClassName("control-group condition")[curr];
-            console.log(currContainer);
-            for (let value of values) {
-                let currentColl = currContainer.item(value);
-                console.log(currentColl);
-                if (currentColl.item(value).selected) {
-                    selectedValue = "courses_" + value;
+    findClass(name, htmlObject) {
+        let childNodes = htmlObject["childNodes"];
+        if (typeof htmlObject == "undefined" || htmlObject === '') {
+            return null;
+        } else if (typeof childNodes == "undefined") {
+            return null;
+        } else if (htmlObject.className === name) {
+            return htmlObject;
+        } else {
+            for (let child of childNodes) {
+                let result = this.findClass(name, child);
+                if (result !== null && typeof result !== "undefined") {
+                    return result;
                 }
             }
-            console.log(selectedValue);
-            for (let operator of operators) {
-
-            }
         }
-    }
-}
-
-class RoomsQueryProcessor {
-    constructor() {
-        console.log("Course processor created");
-        this.query = {"WHERE": {}, "OPTIONS": {"COLUMNS": {}, "ORDER": ""}};
     }
 }
