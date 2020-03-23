@@ -23,12 +23,14 @@ class queryProcessor {
     constructor(queryType) {
         this.query = {"WHERE": {}, "OPTIONS": {"COLUMNS": {}, "ORDER": ""}};
         this.queryType = queryType;
+        this.transformations = [];
     }
 
     processQuery(activeTab, preString) {
+        this.createTransformations(activeTab);
         this.query["WHERE"] = this.getCourseConditions(activeTab);
         this.query["OPTIONS"]["COLUMNS"] = this.getCourseColumns(activeTab);
-        this.query["OPTIONS"]["ORDER"] = this.getCourseOrder(activeTab);
+        this.createCourseOrder(activeTab);
         console.log(this.query);
         return this.query;
     }
@@ -143,17 +145,44 @@ class queryProcessor {
         return columns;
     }
 
-    getCourseOrder(activeTab) {
-        let orderReturn = "";
+    createCourseOrder(activeTab) {
+        let orderReturn = [];
         let order = this.findClass("form-group order", activeTab[0]);
         let order2 = this.findClass("control order fields", order);
         let orderOptions = order2.childNodes[1].childNodes;
         for (let index = 0; index < orderOptions.length; index++) {
             if (orderOptions[index].selected) {
-                orderReturn = this.queryType + "_" + orderOptions[index].value;
+                let newElement = orderOptions[index].value;
+                if (this.transformations.includes(newElement)) {
+                    orderReturn.push(newElement);
+                } else {
+                    orderReturn.push(this.queryType + "_" + newElement);
+                }
             }
         }
+        let descending = this.findClass("control descending", order);
+        if (descending.childNodes[1].checked) {
+            this.query["OPTIONS"]["ORDER"] = {"dir": "DOWN"};
+            if (orderReturn.length === 1) {
+                this.query["OPTIONS"]["ORDER"]["keys"] = orderReturn;
+            } else {
+                this.query["OPTIONS"]["ORDER"]["keys"] = orderReturn;
+            }
+        } else {
+            if (orderReturn.length === 1) {
+                this.query["OPTIONS"]["ORDER"] = orderReturn[0];
+            } else {
+                this.query["OPTIONS"]["ORDER"] = {"dir": "UP"};
+                this.query["OPTIONS"]["ORDER"]["keys"] = orderReturn;
+            }
+        }
+        console.log(this.query.OPTIONS.ORDER);
         return orderReturn;
+    }
+
+    createTransformations(activeTab) {
+        let allTransformations = this.findClass("transformations-container", activeTab[0]).childNodes;
+        console.log(allTransformations);
     }
 
     findClass(name, htmlObject) {
