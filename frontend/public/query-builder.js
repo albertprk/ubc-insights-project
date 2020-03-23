@@ -9,7 +9,7 @@
 CampusExplorer.buildQuery = function() {
     let query = {};
     let activeTab = document.getElementsByClassName("tab-panel active");
-    if (typeof activeTab.namedItem("tab-courses") !== "undefined") {
+    if (activeTab[0].id === "tab-courses") {
         let courseProcessor = new queryProcessor("courses");
         query = courseProcessor.processQuery(activeTab);
     } else {
@@ -91,7 +91,12 @@ class queryProcessor {
                 for (let index = 0; index < fields.length; index++) {
                     if (fields[index].selected) {
                         fieldName = this.queryType + "_" + fields[index].value;
-                        field[fieldName] = this.findClass("control term", curr).childNodes[1].value;
+                        let fieldValue = this.findClass("control term", curr).childNodes[1].value;
+                        if (isNaN(parseInt(fieldValue))) {
+                            field[fieldName] = fieldValue;
+                        } else {
+                            field[fieldName] = parseInt(fieldValue);
+                        }
                     }
                 }
                 let operators = this.findClass("control operators", curr).childNodes[1].childNodes;
@@ -118,10 +123,18 @@ class queryProcessor {
 
     getCourseColumns(controlFields) {
         let columns = [];
-        const fieldsList = ["courses-columns-field-audit", "courses-columns-field-avg", "courses-columns-field-dept",
-            "courses-columns-field-fail", "courses-columns-field-id", "courses-columns-field-instructor",
-            "courses-columns-field-pass", "courses-columns-field-title", "courses-columns-field-uuid",
-            "courses-columns-field-year"];
+        let fieldsList = [];
+        if (this.queryType === "courses") {
+            fieldsList = ["courses-columns-field-audit", "courses-columns-field-avg", "courses-columns-field-dept",
+                "courses-columns-field-fail", "courses-columns-field-id", "courses-columns-field-instructor",
+                "courses-columns-field-pass", "courses-columns-field-title", "courses-columns-field-uuid",
+                "courses-columns-field-year"];
+        } else {
+            fieldsList = ["rooms-columns-field-address", "rooms-columns-field-fullname",
+                "rooms-columns-field-furniture", "rooms-columns-field-href", "rooms-columns-field-lat",
+                "rooms-columns-field-lon", "rooms-columns-field-name", "rooms-columns-field-number",
+                "rooms-columns-field-seats", "rooms-columns-field-shortname", "rooms-columns-field-type"];
+        }
         for (let field of fieldsList) {
             if (document.getElementById(field).checked) {
                 columns.push(this.queryType + "_" + document.getElementById(field).value);
