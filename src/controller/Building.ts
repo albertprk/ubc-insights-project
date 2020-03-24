@@ -7,7 +7,6 @@ import * as http from "http";
 import ZipProcessor from "./ZipProcessor";
 
 export default class Building {
-
     public constructor() {
       Log.trace("Building::init()");
     }
@@ -56,7 +55,6 @@ export default class Building {
             type = c["value"].trim();
           }
         });
-
         obj["type"] = type;
       }
     }

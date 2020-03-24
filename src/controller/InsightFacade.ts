@@ -79,9 +79,6 @@ export default class InsightFacade implements IInsightFacade {
       });
     }
 
-    // If it's an invalid dataset then JSZip will throw an error
-    // Todo: Check to see if there's at least one valid course section
-    // Todo: Skip over invalid file
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         if (id === null || typeof id === "undefined" || content === null ||
             typeof content === "undefined" || kind === null || typeof kind === "undefined") {
