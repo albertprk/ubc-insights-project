@@ -48,12 +48,8 @@ export default class Scheduler implements IScheduler {
                                Array<[SchedRoom, SchedSection, TimeSlot]> {
 
         if (sections.length === 0 || rooms.length === 0) {
-          Log.info(result);
           return result;
         }
-
-        Log.info(sections);
-
         const currentSection = sections[0];
         const validRooms: SchedRoom[] = rooms.filter((room) => {
           return room.rooms_seats >= this.getClassSize(currentSection);
@@ -77,7 +73,6 @@ export default class Scheduler implements IScheduler {
                                  rooms, result, room, roomTracker);
 
                   if (schedule.length !== 0) {
-                    Log.info("My schedule is not length 0");
                     return schedule;
                   } else {
                     result.pop();
