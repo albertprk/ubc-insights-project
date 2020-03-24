@@ -50,19 +50,22 @@ export default class Scheduler implements IScheduler {
         if (sections.length === 0 || rooms.length === 0) {
           return result;
         }
+
         const currentSection = sections[0];
-        const validRooms: SchedRoom[] = rooms.filter((room) => {
-          return room.rooms_seats >= this.getClassSize(currentSection);
-        });
+        const classSize: number = this.getClassSize(currentSection);
+        // const validRooms: SchedRoom[] = rooms.filter((room) => {
+        //   return room.rooms_seats >= classSize;
+        // });
 
-        validRooms.sort((a: SchedRoom, b: SchedRoom) => {
-          return this.getDistance(currentRoom, a) - this.getDistance(currentRoom, b);
-        });
+        // validRooms.sort((a: SchedRoom, b: SchedRoom) => {
+        //   return this.getDistance(currentRoom, a) - this.getDistance(currentRoom, b);
+        // });
 
-        for (let room of validRooms) {
+        for (let room of rooms) {
           for (let slot of this.TIME_SLOTS) {
             if (this.isValidSectionTime(currentSection, slot, roomTracker)
-                && this.isValidRoomSlot(room, slot, roomTracker)) {
+                && this.isValidRoomSlot(room, slot, roomTracker)
+                && room.rooms_seats >= classSize) {
                   let currentResult: [SchedRoom, SchedSection, TimeSlot] =
                   [room, currentSection, slot];
                   result.push(currentResult);
