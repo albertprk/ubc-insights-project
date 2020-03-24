@@ -85,9 +85,9 @@ class queryProcessor {
     getSelectedConditions(activeTab, conditions) {
         let cgConditions = conditions;
         let conditionsToAdd = [];
-        if (activeTab.length === 1) {
-            let conditions = this.findClass("conditions-container", activeTab[0]);
-            let conditionsList = conditions.childNodes;
+        //if (activeTab.length === 1) {
+            let conditionss = this.findClass("conditions-container", activeTab[0]);
+            let conditionsList = conditionss.childNodes;
             for (let index = 0; index < conditionsList.length; index++) {
                 let conditionToAdd = {};
                 let field = {};
@@ -121,9 +121,9 @@ class queryProcessor {
                 }
                 conditionsToAdd.push(conditionToAdd);
             }
-        } else {
-            console.log("Error: Active Tab object length > 1")
-        }
+        //} else {
+        //    console.log("Error: Active Tab object length > 1")
+        //}
         return conditionsToAdd;
     }
 
@@ -146,11 +146,22 @@ class queryProcessor {
                 columns.push(this.queryType + "_" + document.getElementById(field).value);
             }
         }
+        let columnOptions = this.findClass("control-group", controlFields[0]).childNodes;
+        for (let index = 0; index < columnOptions.length; index++) {
+            if (columnOptions[index].className === "control transformation") {
+                let transformation = columnOptions[index].childNodes[1];
+                if (transformation.checked) {
+                    columns.push(transformation.value);
+                }
+            }
+        }
+        /*
         if (this.transformations.length > 0) {
             for (let transformation of this.transformations) {
                 columns.push(Object.keys(transformation)[0]);
             }
         }
+        */
         return columns;
     }
 

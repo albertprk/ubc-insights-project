@@ -1,4 +1,5 @@
 {
     "query1": "simple query IS comparison for department with two columns and old order syntax",
-    "query2": "simple query IS comparison for department with two columns and old order syntax"
+    "query2": "simple query IS comparison for department with two columns and old order syntax",
+    "query3": "more complex test for courses"
 }
