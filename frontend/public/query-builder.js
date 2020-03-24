@@ -24,14 +24,19 @@ class queryProcessor {
         this.query = {"WHERE": {}, "OPTIONS": {"COLUMNS": {}, "ORDER": ""}};
         this.queryType = queryType;
         this.transformations = [];
+        this.group = [];
     }
 
     processQuery(activeTab, preString) {
         this.createTransformations(activeTab);
+        if (this.transformations.length > 0) {
+            this.query["TRANSFORMATIONS"] = {};
+            this.createGroups(activeTab);
+            this.buildQueryTransformations();
+        }
         this.query["WHERE"] = this.getCourseConditions(activeTab);
         this.query["OPTIONS"]["COLUMNS"] = this.getCourseColumns(activeTab);
         this.createCourseOrder(activeTab);
-        console.log(this.query);
         return this.query;
     }
 
@@ -114,7 +119,6 @@ class queryProcessor {
                 } else {
                     conditionToAdd[operator] = field;
                 }
-                console.log(conditionToAdd);
                 conditionsToAdd.push(conditionToAdd);
             }
         } else {
@@ -142,6 +146,11 @@ class queryProcessor {
                 columns.push(this.queryType + "_" + document.getElementById(field).value);
             }
         }
+        if (this.transformations.length > 0) {
+            for (let transformation of this.transformations) {
+                columns.push(Object.keys(transformation)[0]);
+            }
+        }
         return columns;
     }
 
@@ -153,7 +162,11 @@ class queryProcessor {
         for (let index = 0; index < orderOptions.length; index++) {
             if (orderOptions[index].selected) {
                 let newElement = orderOptions[index].value;
-                if (this.transformations.includes(newElement)) {
+                let verifyTransformations = [];
+                for (let transformation of this.transformations) {
+                    verifyTransformations.push(Object.keys(transformation)[0]);
+                }
+                if (verifyTransformations.includes(newElement)) {
                     orderReturn.push(newElement);
                 } else {
                     orderReturn.push(this.queryType + "_" + newElement);
@@ -176,13 +189,52 @@ class queryProcessor {
                 this.query["OPTIONS"]["ORDER"]["keys"] = orderReturn;
             }
         }
-        console.log(this.query.OPTIONS.ORDER);
         return orderReturn;
+    }
+
+    createGroups(activeTab) {
+        let allGroups = this.findClass("control-group", this.findClass("form-group groups", activeTab[0]));
+        for (let index = 1; index < allGroups.childNodes.length; index += 2) {
+            let potential = allGroups.childNodes[index].childNodes[1];
+            if (potential.checked) {
+                this.group.push(this.queryType + "_" + potential.value);
+            }
+        }
     }
 
     createTransformations(activeTab) {
         let allTransformations = this.findClass("transformations-container", activeTab[0]).childNodes;
-        console.log(allTransformations);
+        for (let index = 0; index < allTransformations.length; index++) {
+            let transformationToAdd = {};
+            let transformationTerm = "";
+            let transformationOperator = "";
+            let transformationField = "";
+            let transformation = allTransformations[index];
+            transformationTerm = this.findClass("control term", transformation).childNodes[1].value;
+            let controlOperators = this.findClass("control operators", transformation);
+            let operators = controlOperators.childNodes[1].childNodes;
+            for (let operator of operators) {
+                if (operator.selected) {
+                    transformationOperator = operator.value;
+                }
+            }
+            let controlFields = this.findClass("control fields", transformation);
+            let fields = controlFields.childNodes[1].childNodes;
+            for (let field of fields) {
+                if (field.selected) {
+                    transformationField = this.queryType + "_" + field.value;
+                }
+            }
+            transformationToAdd[transformationTerm] = {};
+            transformationToAdd[transformationTerm][transformationOperator] = transformationField;
+            this.transformations.push(transformationToAdd);
+        }
+    }
+
+    buildQueryTransformations() {
+        this.query["TRANSFORMATIONS"] = {};
+        this.query["TRANSFORMATIONS"]["GROUP"] = this.group;
+        this.query["TRANSFORMATIONS"]["APPLY"] = this.transformations;
     }
 
     findClass(name, htmlObject) {
