@@ -16,6 +16,7 @@ CampusExplorer.buildQuery = function() {
         let roomsProcessor = new queryProcessor("rooms");
         query = roomsProcessor.processQuery(activeTab);
     }
+    console.log(query);
     return query;
 };
 
@@ -155,13 +156,6 @@ class queryProcessor {
                 }
             }
         }
-        /*
-        if (this.transformations.length > 0) {
-            for (let transformation of this.transformations) {
-                columns.push(Object.keys(transformation)[0]);
-            }
-        }
-        */
         return columns;
     }
 
