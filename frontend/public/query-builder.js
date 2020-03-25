@@ -9,6 +9,7 @@
 CampusExplorer.buildQuery = function() {
     let query = {};
     let activeTab = document.getElementsByClassName("tab-panel active");
+    //console.log(activeTab[0]);
     if (activeTab[0].id === "tab-courses") {
         let courseProcessor = new queryProcessor("courses");
         query = courseProcessor.processQuery(activeTab);
@@ -29,6 +30,7 @@ class queryProcessor {
     }
 
     processQuery(activeTab, preString) {
+        console.log(this.queryType);
         this.createTransformations(activeTab);
         if (this.transformations.length > 0) {
             this.query["TRANSFORMATIONS"] = {};
@@ -43,16 +45,16 @@ class queryProcessor {
 
     getCourseConditions(activeTab) {
         let conditions = {};
-        const possibleConditionTypes = ["courses-conditiontype-all", "courses-conditiontype-any",
-                                        "courses-conditiontype-none"];
         let selectedConditionType = "";
-        for (let possibleConditionType of possibleConditionTypes) {
-            if (document.getElementById(possibleConditionType).checked) {
-                selectedConditionType = possibleConditionType;
+        let conditionTypes = this.findClass("control-group condition-type", activeTab[0]);
+        console.log(conditionTypes.childNodes);
+        for (let index = 1; index < conditionTypes.childNodes.length; index += 2) {
+            if (conditionTypes.childNodes[index].childNodes[1].checked) {
+                selectedConditionType = conditionTypes.childNodes[index].childNodes[1].value;
             }
         }
         switch(selectedConditionType) {
-            case "courses-conditiontype-all":
+            case "all":
                 if (this.findClass("conditions-container", activeTab[0]).childNodes.length > 1) {
                     conditions["AND"] = {};
                     conditions["AND"] = this.getSelectedConditions(activeTab, conditions);
@@ -60,7 +62,7 @@ class queryProcessor {
                     conditions = this.getSelectedConditions(activeTab, conditions)[0];
                 }
                 return conditions;
-            case "courses-conditiontype-any":
+            case "any":
                 if (this.findClass("conditions-container", activeTab[0]).childNodes.length > 1) {
                     conditions["OR"] = {};
                     conditions["OR"] = this.getSelectedConditions(activeTab, conditions);
@@ -68,9 +70,9 @@ class queryProcessor {
                     conditions = this.getSelectedConditions(activeTab, conditions)[0];
                 }
                 return conditions;
-            case "courses-conditiontype-none":
+            case "none":
                 if (this.findClass("conditions-container", activeTab[0]).childNodes.length > 1) {
-                    conditions["NOT"]["OR"] = {};
+                    conditions["NOT"] = {};
                     conditions["NOT"]["OR"] = this.getSelectedConditions(activeTab, conditions);
                 } else {
                     conditions["NOT"] = {};

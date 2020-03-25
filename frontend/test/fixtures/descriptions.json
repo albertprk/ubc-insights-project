@@ -7,16 +7,5 @@
     "query6": "ALL single string condition, multiple column, single order descending, no groups or transformation",
     "query7": "ANY single numerical condition, multiple column, single order, no groups or transformation",
     "query8": "ANY single string condition, multiple column, single order, no groups or transformation",
-    "query9": "NOT single numerical condition, multiple column, single order, no groups or transformation",
-    "query10": "NOT single string condition, multiple column, single order, no groups or transformation",
-    "query11": "ALL multiple numerical condition, multiple column, single order, no groups or transformation",
-    "query12": "ALL multiple numerical condition, multiple column, mult order, no groups or transformation",
-    "query13": "ALL multiple string condition, multiple column, single order, no groups or transformation",
-    "query14": "ANY multiple numerical condition, multiple column, single order, no groups or transformation",
-    "query15": "ANY multiple string condition, multiple column, single order, no groups or transformation",
-    "query16": "NOT multiple numerical condition, multiple column, single order, no groups or transformation",
-    "query17": "NOT multiple string condition, multiple column, single order, no groups or transformation",
-    "query18": "ALL single numerical condition, multiple column, single order, multiple groups, one transformation",
-    "query19": "ALL single numerical condition, multiple column, multiple order, multiple groups, mult transformation",
-    "query20": "ALL single numerical condition, multiple column, single order, one groups, mult transformation",
+    "query9": "NOT single numerical condition, multiple column, single order, no groups or transformation"
 }
