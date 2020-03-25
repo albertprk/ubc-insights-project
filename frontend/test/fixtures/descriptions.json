@@ -7,5 +7,8 @@
     "query6": "ALL single string condition, multiple column, single order descending, no groups or transformation",
     "query7": "ANY single numerical condition, multiple column, single order, no groups or transformation",
     "query8": "ANY single string condition, multiple column, single order, no groups or transformation",
-    "query9": "NOT single numerical condition, multiple column, single order, no groups or transformation"
+    "query9": "NOT single numerical condition, multiple column, single order, no groups or transformation",
+    "groupedMultiSortCourses": "grouped multi sort",
+    "complex": "complex",
+    "noconditions": "query with no conditions"
 }

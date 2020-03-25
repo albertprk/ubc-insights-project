@@ -4,6 +4,76 @@
     "OPTIONS": {"COLUMNS": ["rooms_address", "rooms_fullname", "rooms_name"],
         "ORDER": {"dir": "UP", "keys": ["rooms_address", "rooms_shortname"]}},
     "TRANSFORMATIONS": {"GROUP": ["rooms_shortname"], "APPLY": [{"maxSeats": {"MAX": "rooms_seats"}}]}},
+    "groupedMultiSortCourses": {
+        "WHERE": {
+            "AND": [
+                {
+                    "LT": {
+                        "courses_avg": 90
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_dept": "*cb"
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_fail",
+                "courses_pass",
+                "courses_audit",
+                "courses_year",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_uuid",
+                "overallAvg"
+            ],
+            "ORDER": {
+                "dir": "UP",
+                "keys": [
+                    "courses_dept",
+                    "courses_avg",
+                    "courses_fail",
+                    "courses_pass",
+                    "courses_audit",
+                    "courses_year",
+                    "courses_id",
+                    "courses_instructor",
+                    "courses_title",
+                    "courses_uuid",
+                    "overallAvg"
+                ]
+            }
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_dept",
+                "courses_avg",
+                "courses_fail",
+                "courses_pass",
+                "courses_audit",
+                "courses_year",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_uuid"
+            ],
+            "APPLY": [
+                {
+                    "overallAvg": {
+                        "AVG": "courses_avg"
+                    }
+                }
+            ]
+        }
+    },
+    "noconditions": {"WHERE": {},
+        "OPTIONS": {"COLUMNS": ["courses_avg", "courses_dept"], "ORDER": "courses_avg"}},
     "query1":{"WHERE": {"IS": {"courses_dept": "cpsc"} },
               "OPTIONS": {"COLUMNS": ["courses_dept", "courses_id"], "ORDER": "courses_id"}},
     "query2":{"WHERE": {"AND": [{"IS": {"rooms_furniture": "*Tables*"}},

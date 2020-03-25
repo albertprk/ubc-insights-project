@@ -30,14 +30,18 @@ class queryProcessor {
     }
 
     processQuery(activeTab, preString) {
-        console.log(this.queryType);
         this.createTransformations(activeTab);
         if (this.transformations.length > 0) {
             this.query["TRANSFORMATIONS"] = {};
             this.createGroups(activeTab);
             this.buildQueryTransformations();
         }
-        this.query["WHERE"] = this.getCourseConditions(activeTab);
+        let conditions = this.getCourseConditions(activeTab);
+        if (typeof conditions === "undefined") {
+            this.query["WHERE"] = {};
+        } else {
+            this.query["WHERE"] = conditions;
+        }
         this.query["OPTIONS"]["COLUMNS"] = this.getCourseColumns(activeTab);
         this.createCourseOrder(activeTab);
         return this.query;
@@ -47,7 +51,6 @@ class queryProcessor {
         let conditions = {};
         let selectedConditionType = "";
         let conditionTypes = this.findClass("control-group condition-type", activeTab[0]);
-        console.log(conditionTypes.childNodes);
         for (let index = 1; index < conditionTypes.childNodes.length; index += 2) {
             if (conditionTypes.childNodes[index].childNodes[1].checked) {
                 selectedConditionType = conditionTypes.childNodes[index].childNodes[1].value;
@@ -87,42 +90,48 @@ class queryProcessor {
 
     getSelectedConditions(activeTab, conditions) {
         let cgConditions = conditions;
+        let emptyReturn = {};
+        console.log(typeof emptyReturn);
         let conditionsToAdd = [];
         //if (activeTab.length === 1) {
             let conditionss = this.findClass("conditions-container", activeTab[0]);
             let conditionsList = conditionss.childNodes;
-            for (let index = 0; index < conditionsList.length; index++) {
-                let conditionToAdd = {};
-                let field = {};
-                let fieldName = "";
-                let operator = "";
-                let curr = conditionsList[index];
-                let fields = this.findClass("control fields", curr).childNodes[1].childNodes;
-                for (let index = 0; index < fields.length; index++) {
-                    if (fields[index].selected) {
-                        fieldName = this.queryType + "_" + fields[index].value;
-                        let fieldValue = this.findClass("control term", curr).childNodes[1].value;
-                        if (isNaN(parseInt(fieldValue))) {
-                            field[fieldName] = fieldValue;
-                        } else {
-                            field[fieldName] = parseInt(fieldValue);
+            if (conditionsList.length > 0) {
+                for (let index = 0; index < conditionsList.length; index++) {
+                    let conditionToAdd = {};
+                    let field = {};
+                    let fieldName = "";
+                    let operator = "";
+                    let curr = conditionsList[index];
+                    let fields = this.findClass("control fields", curr).childNodes[1].childNodes;
+                    for (let index = 0; index < fields.length; index++) {
+                        if (fields[index].selected) {
+                            fieldName = this.queryType + "_" + fields[index].value;
+                            let fieldValue = this.findClass("control term", curr).childNodes[1].value;
+                            if (isNaN(parseInt(fieldValue))) {
+                                field[fieldName] = fieldValue;
+                            } else {
+                                field[fieldName] = parseInt(fieldValue);
+                            }
                         }
                     }
-                }
-                let operators = this.findClass("control operators", curr).childNodes[1].childNodes;
-                for (let index = 0; index < operators.length; index++) {
-                    if (operators[index].selected) {
-                        operator = operators[index].value;
+                    let operators = this.findClass("control operators", curr).childNodes[1].childNodes;
+                    for (let index = 0; index < operators.length; index++) {
+                        if (operators[index].selected) {
+                            operator = operators[index].value;
+                        }
                     }
+                    let controlNot = this.findClass("control not", curr);
+                    if (controlNot.childNodes[1].checked) {
+                        conditionToAdd = {"NOT": {}};
+                        conditionToAdd["NOT"][operator] = field;
+                    } else {
+                        conditionToAdd[operator] = field;
+                    }
+                    conditionsToAdd.push(conditionToAdd);
                 }
-                let controlNot = this.findClass("control not", curr);
-                if (controlNot.childNodes[1].checked) {
-                    conditionToAdd = {"NOT": {}};
-                    conditionToAdd["NOT"][operator] = field;
-                } else {
-                    conditionToAdd[operator] = field;
-                }
-                conditionsToAdd.push(conditionToAdd);
+            } else {
+                return emptyReturn;
             }
         //} else {
         //    console.log("Error: Active Tab object length > 1")
