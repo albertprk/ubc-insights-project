@@ -9,7 +9,7 @@ export default class Scheduler implements IScheduler {
     "TR  0800-0930", "TR  0930-1100", "TR  1100-1230",
     "TR  1230-1400", "TR  1400-1530", "TR  1530-1700"];
 
-    private usedRooms: Record<string, TimeSlot[]> = {};
+    private allRooms: Array<Record<string, Record<string, any>>> = [];
     private usedSectionTimes: Record<string, TimeSlot[]> = {};
 
     public schedule(sections: SchedSection[],
@@ -22,118 +22,67 @@ export default class Scheduler implements IScheduler {
           return b.rooms_seats - a.rooms_seats;
         });
 
+        rooms.forEach((room: SchedRoom) => {
+          let roomName: string = this.getRoomName(room);
+          let object: Record<string, Record<string, any>> = {};
+          object[roomName] = {};
+          object[roomName]["times"] = [...this.TIME_SLOTS];
+          object[roomName]["room"] = room;
+          this.allRooms.push(Object.assign({}, object));
+        });
+
         let result: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
-        return this.backtrackingSearch(sections, rooms, result, rooms[0]);
-    }
 
-    private backtrackingSearch(sections: SchedSection[], rooms: SchedRoom[],
-                               result:  Array<[SchedRoom, SchedSection, TimeSlot]>,
-                               currentRoom: SchedRoom):
-                               Array<[SchedRoom, SchedSection, TimeSlot]> {
-
-        if (sections.length === 0 || rooms.length === 0) {
+        if (rooms.length === 0) {
           return result;
         }
 
-        const currentSection = sections[0];
-        const classSize: number = this.getClassSize(currentSection);
+        for (let section of sections) {
+          let currentResult: [SchedRoom, SchedSection, TimeSlot] =
+          this.getTimeSlot(section);
 
-        for (let room of rooms) {
-          if (room.rooms_seats >= classSize && this.isValidRoom(room)
-          && this.isValidTime(currentSection)) {
-            let timeSlot = this.getTimeSlot(currentSection, room);
-            if (timeSlot !== null) {
-              let currentResult: [SchedRoom, SchedSection, TimeSlot] =
-              [room, currentSection, timeSlot];
-              result.push(currentResult);
-              let schedule = this.backtrackingSearch(sections.slice(1),
-                                                     rooms,
-                                                     result,
-                                                     room);
-              if (schedule.length !== 0) {
-                return schedule;
-              } else {
-                result.pop();
-                this.addTimesBack(currentSection, room, timeSlot);
-              }
-            }
+          if (currentResult !== null) {
+            result.push(currentResult);
           }
         }
 
-        // for (let room of rooms) {
-        //   for (let slot of this.TIME_SLOTS) {
-        //     if (this.isValidSectionTime(currentSection, slot, roomTracker)
-        //         && this.isValidRoomSlot(room, slot, roomTracker)
-        //         && room.rooms_seats >= classSize) {
-        //           let currentResult: [SchedRoom, SchedSection, TimeSlot] =
-        //           [room, currentSection, slot];
-        //           result.push(currentResult);
-        //
-        //           roomTracker[slot]["classes"].push(this.getClassName(currentSection));
-        //           roomTracker[slot]["rooms"].push(this.getRoomName(room));
-        //           let schedule = this.backtrackingSearch(sections.slice(1),
-        //                          rooms, result, room, roomTracker);
-        //
-        //           if (schedule.length !== 0) {
-        //             return schedule;
-        //           } else {
-        //             result.pop();
-        //             roomTracker[slot]["classes"].pop();
-        //             roomTracker[slot]["rooms"].pop();
-        //           }
-        //         }
-        //   }
-        // }
-
-        return [];
+        return result;
     }
 
-    private addTimesBack(section: SchedSection, room: SchedRoom, slot: TimeSlot): void {
-      this.usedRooms[this.getRoomName(room)].push(slot);
-      this.usedSectionTimes[this.getClassName(section)].push(slot);
-    }
+    private getTimeSlot(section: SchedSection): [SchedRoom, SchedSection, TimeSlot] {
+      for (let j = 0; j < this.allRooms.length; j++) {
+        let record = this.allRooms[j];
+        let key = Object.keys(record)[0];
+        for (let i = 0; i < record[key]["times"].length; i++) {
+          if (this.isValidTime(section, record[key]["times"][i])) {
+            let currentResult: [SchedRoom, SchedSection, TimeSlot] = [
+              record[key]["room"], section, record[key]["times"][i]
+            ];
 
-    private isValidRoom(room: SchedRoom): boolean {
-      let name: string = room.rooms_shortname + room.rooms_number;
+            record[key]["times"].splice(i, 1);
+            if (record[key]["times"].length === 0) {
+              this.allRooms.splice(j, 1);
+            }
 
-      if (typeof this.usedRooms[name] === "undefined") {
-        this.usedRooms[name] = [...this.TIME_SLOTS];
-        return true;
-      } else if (this.usedRooms[name].length === 0) {
-        return false;
-      } else {
-        return true;
+            return currentResult;
+          }
+        }
+        return null;
+
       }
     }
 
-    private isValidTime(section: SchedSection): boolean {
+    private isValidTime(section: SchedSection, slot: TimeSlot): boolean {
       let name: string = this.getClassName(section);
       if (typeof this.usedSectionTimes[name] === "undefined") {
-        this.usedSectionTimes[name] = [...this.TIME_SLOTS];
+        this.usedSectionTimes[name] = [slot];
         return true;
-      } else if (this.usedSectionTimes[name].length === 0) {
+      } else if (this.usedSectionTimes[name].indexOf(slot) > -1) {
         return false;
       } else {
+        this.usedSectionTimes[name].push(slot);
         return true;
       }
-    }
-
-    private getTimeSlot(section: SchedSection, room: SchedRoom): TimeSlot {
-      let sectionName = this.getClassName(section);
-      let roomName = this.getRoomName(room);
-      let index: number = null;
-
-      for (let i = 0; i < this.usedRooms[roomName].length; i++) {
-        index = this.usedSectionTimes[sectionName].indexOf(this.usedRooms[roomName][i]);
-        if (index > -1) {
-          let result: TimeSlot = this.usedRooms[roomName][i];
-          this.usedSectionTimes[sectionName].splice(index, 1);
-          this.usedRooms[roomName].splice(i, 1);
-          return result;
-        }
-      }
-
-      return null;
     }
 
     private getClassSize(section: SchedSection): number {
