@@ -17,7 +17,6 @@ CampusExplorer.buildQuery = function() {
         let roomsProcessor = new queryProcessor("rooms");
         query = roomsProcessor.processQuery(activeTab);
     }
-    console.log(query);
     return query;
 };
 
