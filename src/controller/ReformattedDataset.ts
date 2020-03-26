@@ -256,6 +256,8 @@ export default class ReformattedDataset {
         let val = section[field];
         if (section["Section"] === "overall" && value === "year") {
           val = 1900;
+        } else if (value === "year") {
+          val = parseInt(val, 10);
         }
         if (val < min) {
           min = val;

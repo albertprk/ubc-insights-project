@@ -5,6 +5,7 @@
 import fs = require("fs");
 import restify = require("restify");
 import Log from "../Util";
+import InsightFacade from "../controller/InsightFacade";
 
 /**
  * This configures the REST endpoints for the server.
@@ -13,10 +14,12 @@ export default class Server {
 
     private port: number;
     private rest: restify.Server;
+    private insightFacade: InsightFacade;
 
     constructor(port: number) {
         Log.info("Server::<init>( " + port + " )");
         this.port = port;
+        this.insightFacade = new InsightFacade();
     }
 
     /**
