@@ -97,11 +97,15 @@ export default class Server {
     private put(req: restify.Request, res: restify.Response, next: restify.Next) {
       const that = this;
       let iFacade: InsightFacade = new InsightFacade();
-      that.rest.use(restify.bodyParser({mapFiles: true, mapParams: true}));
+      Log.info(req.params);
+      Log.info(res);
       iFacade.addDataset(req.params.id, req.body.toString("base64"), req.params.kind)
         .then((str: any) => {
-          res.json(200, {result: str});
+          Log.info("200 success");
+          res.send(200, {result: str});
         }).catch((err: any) => {
+          Log.info("400 error");
+          Log.trace(err);
           res.json(400, {error: err});
       });
 
@@ -111,6 +115,7 @@ export default class Server {
     private post(req: restify.Request, res: restify.Response, next: restify.Next) {
       const that = this;
       let iFacade: InsightFacade = new InsightFacade();
+
       iFacade.performQuery(req.params)
         .then((str: any) => {
           res.send(200, {
@@ -131,7 +136,7 @@ export default class Server {
       let iFacade: InsightFacade = new InsightFacade();
       iFacade.listDatasets()
         .then((str: any) => {
-          res.json(200, {
+          res.send(200, {
             result: str
           });
         }).catch((err: any) => {
@@ -148,7 +153,7 @@ export default class Server {
       let iFacade: InsightFacade = new InsightFacade();
       iFacade.removeDataset(req.params.id)
         .then((str: any) => {
-          res.json(200, {
+          res.send(200, {
             result: str
           });
         }).catch((err: any) => {
