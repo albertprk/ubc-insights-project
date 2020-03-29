@@ -1,3 +1,15 @@
 {
-    "query1": "simple query IS comparison for department with two columns and old order syntax"
+    "query1": "Test: Simple query IS comparison for department with two columns and old order syntax",
+    "query2": "Test: Simple query IS comparison for department with two columns and old order syntax",
+    "query3": "Test: More complex test for courses",
+    "query4": "ALL single numerical condition, multiple column, single order, no groups or transformation",
+    "query5": "NOT ALL single numerical condition, multiple column, single order, no groups or transformation",
+    "query6": "ALL single string condition, multiple column, single order descending, no groups or transformation",
+    "query7": "ANY single numerical condition, multiple column, single order, no groups or transformation",
+    "query8": "ANY single string condition, multiple column, single order, no groups or transformation",
+    "query9": "NOT single numerical condition, multiple column, single order, no groups or transformation",
+    "groupedMultiSortCourses": "grouped multi sort",
+    "complex": "complex",
+    "noconditions": "query with no conditions",
+    "noinputs": "query with no inputs at all"
 }
