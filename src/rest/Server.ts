@@ -6,6 +6,7 @@ import fs = require("fs");
 import restify = require("restify");
 import Log from "../Util";
 import InsightFacade from "../controller/InsightFacade";
+import {InsightError} from "../controller/IInsightFacade";
 
 /**
  * This configures the REST endpoints for the server.
@@ -50,7 +51,6 @@ export default class Server {
         return new Promise(function (fulfill, reject) {
             try {
                 Log.info("Server::start() - start");
-
                 that.rest = restify.createServer({
                     name: "insightUBC",
                 });
@@ -67,6 +67,10 @@ export default class Server {
                 that.rest.get("/echo/:msg", Server.echo);
 
                 // NOTE: your endpoints should go here
+                that.rest.put("/dataset/:id/:kind", that.put);
+                that.rest.del("/dataset/:id", that.del);
+                that.rest.post("/query", that.post);
+                that.rest.get("/datasets", that.get);
 
                 // This must be the last endpoint!
                 that.rest.get("/.*", Server.getStatic);
@@ -88,6 +92,78 @@ export default class Server {
                 reject(err);
             }
         });
+    }
+
+    private put(req: restify.Request, res: restify.Response, next: restify.Next) {
+      const that = this;
+      let iFacade: InsightFacade = new InsightFacade();
+      that.rest.use(restify.bodyParser({mapFiles: true, mapParams: true}));
+      iFacade.addDataset(req.params.id, req.body.toString("base64"), req.params.kind)
+        .then((str: any) => {
+          res.json(200, {result: str});
+        }).catch((err: any) => {
+          res.json(400, {error: err});
+      });
+
+      return next();
+    }
+
+    private post(req: restify.Request, res: restify.Response, next: restify.Next) {
+      const that = this;
+      let iFacade: InsightFacade = new InsightFacade();
+      iFacade.performQuery(req.params)
+        .then((str: any) => {
+          res.send(200, {
+            result: str
+          });
+        }).catch((err: any) => {
+          Log.trace(err);
+          res.json(400, {
+            error: err
+          });
+      });
+
+      return next();
+    }
+
+    private get(req: restify.Request, res: restify.Response, next: restify.Next) {
+      const that = this;
+      let iFacade: InsightFacade = new InsightFacade();
+      iFacade.listDatasets()
+        .then((str: any) => {
+          res.json(200, {
+            result: str
+          });
+        }).catch((err: any) => {
+          res.json(400, {
+            error: err
+          });
+      });
+
+      return next();
+    }
+
+    private del(req: restify.Request, res: restify.Response, next: restify.Next) {
+      const that = this;
+      let iFacade: InsightFacade = new InsightFacade();
+      iFacade.removeDataset(req.params.id)
+        .then((str: any) => {
+          res.json(200, {
+            result: str
+          });
+        }).catch((err: any) => {
+          if (err.constructor === InsightError) {
+            res.json(400, {
+              error: err
+            });
+          } else {
+            res.json(404, {
+              error: err
+            });
+          }
+      });
+
+      return next();
     }
 
     // The next two methods handle the echo service.

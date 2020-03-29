@@ -10,6 +10,10 @@
 
 // TODO: implement!
 
-const button = document.getElementById("submit-button");
-const query = CampusExplorer.buildQuery();
-CampusExplorer.sendQuery(query).then((result) => CampusExplorer.renderResult(result));
+const button = document.getElementById("submit-button")
+                       .addEventListener("click", submitQuery);
+
+function submitQuery() {
+  const query = CampusExplorer.buildQuery();
+  CampusExplorer.sendQuery(query).then((result) => CampusExplorer.renderResult(result));
+}

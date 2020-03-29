@@ -22,7 +22,7 @@ CampusExplorer.buildQuery = function() {
 
 class queryProcessor {
     constructor(queryType) {
-        this.query = {"WHERE": {}, "OPTIONS": {"COLUMNS": {}, "ORDER": ""}};
+        this.query = {"WHERE": {}, "OPTIONS": {"COLUMNS": {}}};
         this.queryType = queryType;
         this.transformations = [];
         this.group = [];
@@ -187,6 +187,10 @@ class queryProcessor {
                     orderReturn.push(this.queryType + "_" + newElement);
                 }
             }
+        }
+
+        if (orderReturn.length === 0) {
+          return;
         }
         let descending = this.findClass("control descending", order);
         if (descending.childNodes[1].checked) {
