@@ -54,7 +54,7 @@ export default class InsightFacade implements IInsightFacade {
       });
     }
 
-    private findKind(content: Buffer): Promise<InsightDatasetKind> {
+    public findKind(content: Buffer): Promise<InsightDatasetKind> {
       return new Promise((resolve, reject) => {
         let zipFile: JSZip = new JSZip();
         zipFile.loadAsync(content, { base64: true }).then((files) => {

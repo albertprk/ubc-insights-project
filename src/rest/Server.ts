@@ -6,7 +6,8 @@ import fs = require("fs");
 import restify = require("restify");
 import Log from "../Util";
 import InsightFacade from "../controller/InsightFacade";
-import {InsightError} from "../controller/IInsightFacade";
+import QueryValidator from "../controller/QueryValidator";
+import {InsightError, InsightDatasetKind, NotFoundError} from "../controller/IInsightFacade";
 
 /**
  * This configures the REST endpoints for the server.
@@ -97,16 +98,14 @@ export default class Server {
     private put(req: restify.Request, res: restify.Response, next: restify.Next) {
       const that = this;
       let iFacade: InsightFacade = new InsightFacade();
-      Log.info(req.params);
-      Log.info(res);
-      iFacade.addDataset(req.params.id, req.body.toString("base64"), req.params.kind)
-        .then((str: any) => {
-          Log.info("200 success");
+      let content: string = req.body.toString("base64");
+      iFacade.findKind(req.body).then((kind) => {
+        return iFacade.addDataset(req.params.id, content, kind);
+      }).then((str: any) => {
           res.send(200, {result: str});
         }).catch((err: any) => {
-          Log.info("400 error");
           Log.trace(err);
-          res.json(400, {error: err});
+          res.json(400, {error: "InsightError"});
       });
 
       return next();
@@ -124,7 +123,7 @@ export default class Server {
         }).catch((err: any) => {
           Log.trace(err);
           res.json(400, {
-            error: err
+            error: "InsightError"
           });
       });
 
@@ -136,12 +135,10 @@ export default class Server {
       let iFacade: InsightFacade = new InsightFacade();
       iFacade.listDatasets()
         .then((str: any) => {
-          res.send(200, {
-            result: str
-          });
+          res.send(200);
         }).catch((err: any) => {
           res.json(400, {
-            error: err
+            error: "InsightError"
           });
       });
 
@@ -149,8 +146,8 @@ export default class Server {
     }
 
     private del(req: restify.Request, res: restify.Response, next: restify.Next) {
-      const that = this;
       let iFacade: InsightFacade = new InsightFacade();
+      Log.info("Inside delete");
       iFacade.removeDataset(req.params.id)
         .then((str: any) => {
           res.send(200, {
@@ -159,11 +156,12 @@ export default class Server {
         }).catch((err: any) => {
           if (err.constructor === InsightError) {
             res.json(400, {
-              error: err
+              error: "InsightError"
             });
           } else {
+            Log.info(err.constructor === NotFoundError);
             res.json(404, {
-              error: err
+              error: "Error"
             });
           }
       });
