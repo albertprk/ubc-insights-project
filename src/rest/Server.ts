@@ -102,13 +102,14 @@ export default class Server {
       iFacade.findKind(req.body).then((kind) => {
         return iFacade.addDataset(req.params.id, content, kind);
       }).then((str: any) => {
+          Log.trace(str);
           res.send(200, {result: str});
         }).catch((err: any) => {
           Log.trace(err);
           res.json(400, {error: "InsightError"});
+      }).then(() => {
+        return next();
       });
-
-      return next();
     }
 
     private post(req: restify.Request, res: restify.Response, next: restify.Next) {
@@ -135,7 +136,7 @@ export default class Server {
       let iFacade: InsightFacade = new InsightFacade();
       iFacade.listDatasets()
         .then((str: any) => {
-          res.send(200);
+          res.send(200, {result: str});
         }).catch((err: any) => {
           res.json(400, {
             error: "InsightError"
@@ -147,26 +148,25 @@ export default class Server {
 
     private del(req: restify.Request, res: restify.Response, next: restify.Next) {
       let iFacade: InsightFacade = new InsightFacade();
-      Log.info("Inside delete");
-      iFacade.removeDataset(req.params.id)
+      iFacade.removeDataset(req.body)
         .then((str: any) => {
           res.send(200, {
             result: str
           });
         }).catch((err: any) => {
+          Log.info(err);
           if (err.constructor === InsightError) {
             res.json(400, {
               error: "InsightError"
             });
           } else {
-            Log.info(err.constructor === NotFoundError);
             res.json(404, {
               error: "Error"
             });
           }
+      }).then(() => {
+        return next();
       });
-
-      return next();
     }
 
     // The next two methods handle the echo service.
