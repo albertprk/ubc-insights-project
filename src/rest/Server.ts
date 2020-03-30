@@ -116,7 +116,7 @@ export default class Server {
       const that = this;
       let iFacade: InsightFacade = new InsightFacade();
 
-      iFacade.performQuery(req.params)
+      iFacade.performQuery(req.body)
         .then((str: any) => {
           res.send(200, {
             result: str
