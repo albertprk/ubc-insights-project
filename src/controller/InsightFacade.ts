@@ -173,14 +173,21 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((resolve, reject) => {
             if (id === null) {
                 reject(new InsightError("Invalid input: cannot have a null dataset"));
-            } else if (typeof this.datasets.get(id) === "undefined") {
-                reject(new NotFoundError("Unable to find error"));
             }
 
-            this.datasets.delete(id);
-            const file: string = path.join(this.dataFolder, "/" + id + ".zip");
+            let filePath: string = path.join(this.dataFolder, "/" + id + ".zip");
 
-            fs.unlink(file, (err) => {
+            if (!fs.existsSync(filePath)) {
+                Log.info("Rejecting");
+                reject(new NotFoundError("Unable to find error"));
+            } else if (!(typeof this.datasets.get(id) === "undefined")) {
+              this.datasets.delete(id);
+            }
+
+            Log.info("Still working");
+
+            fs.unlink(filePath, (err) => {
+                Log.info("removing data");
                 if (err) {
                     reject(new InsightError("Unable to remove dataset"));
                 } else {
@@ -254,13 +261,30 @@ export default class InsightFacade implements IInsightFacade {
 
     public listDatasets(): Promise<InsightDataset[]> {
         return new Promise((resolve, reject) => {
-            let results: InsightDataset[] = [];
-
+            let promises: Array<Promise<string[][]>> = [];
             try {
-                this.datasets.forEach((value: Dataset, key: string) => {
-                    results.push(value.insightDataset);
+                fs.readdir(this.dataFolder, (err, files) => {
+                  let results: InsightDataset[] = [];
+
+                  for (let file of files) {
+                    let index = file.indexOf(".zip");
+                    let id = file.substring(0, index);
+
+                    if (typeof this.datasets.get(id) === "undefined") {
+                      promises.push(this.loadDatasetFromMemory(this.dataFolder + "/" + file, id));
+                    }
+                  }
+
+                  Promise.all(promises).then(() => {
+                    for (let entry of this.datasets.entries()) {
+                      results.push(entry[1].insightDataset);
+                    }
+                  }).then(() => {
+                    Log.info(results);
+                    resolve(results);
+                  });
+
                 });
-                resolve(results);
             } catch {
                 reject(new InsightError());
             }
